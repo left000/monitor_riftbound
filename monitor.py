@@ -21,24 +21,69 @@ FORBIDDEN_SETS = ["Radiance"]
 
 PRODUCT_KEYWORDS = {
     "case": [
-        "case", "6x", "6 booster box", "display case", "caja de 6", 
-        "carton", "x6", "master case", "caja nodriza", "expositor de 6",
-        "masterbox", "caja master", "pack de 6", "6x booster", "sealed case",
-        "caja de 6 unidades", "display de 6", "cartone", "box da 6", "espositore da 6"
+        "case",
+        "6x",
+        "6 booster box",
+        "display case",
+        "caja de 6",
+        "carton",
+        "x6",
+        "master case",
+        "caja nodriza",
+        "expositor de 6",
+        "masterbox",
+        "caja master",
+        "pack de 6",
+        "6x booster",
+        "sealed case",
+        "caja de 6 unidades",
+        "display de 6",
+        "cartone",
+        "box da 6",
+        "espositore da 6",
     ],
     "display_24": [
-        "24", "booster display", "booster box", "slim booster box", 
-        "caja de sobres", "caja expositora", "display de 24", 
-        "box 24", "caja suelta", "booster pack box", "caja de 24",
-        "expositor de 24", "display box", "box di bustine", "display da 24"
-    ]
+        "24",
+        "booster display",
+        "booster box",
+        "slim booster box",
+        "caja de sobres",
+        "caja expositora",
+        "display de 24",
+        "box 24",
+        "caja suelta",
+        "booster pack box",
+        "caja de 24",
+        "expositor de 24",
+        "display box",
+        "box di bustine",
+        "display da 24",
+    ],
 }
 
 TERMINI_ESAURITO = [
-    "agotado", "agotados", "sold out", "sin stock", "no disponible", 
-    "out of stock", "sin existencias", "proximamente", "próximamente", 
-    "coming soon", "reservar", "reserva", "pre-order", "preventa", "reposición",
-    "esaurito", "esauriti", "senza scorte", "non disponibile", "in arrivo", "notifica", "preordine"
+    "agotado",
+    "agotados",
+    "sold out",
+    "sin stock",
+    "no disponible",
+    "out of stock",
+    "sin existencias",
+    "proximamente",
+    "próximamente",
+    "coming soon",
+    "reservar",
+    "reserva",
+    "pre-order",
+    "preventa",
+    "reposición",
+    "esaurito",
+    "esauriti",
+    "senza scorte",
+    "non disponibile",
+    "in arrivo",
+    "notifica",
+    "preordine",
 ]
 
 ALL_STORES = {
@@ -54,8 +99,12 @@ ALL_STORES = {
     "Spagna - Negozi Specializzati & Catene (Gruppo 1)": {
         "Factory Cards": "https://factorycards.es",
         "Micelion Games": "https://miceliongames.com",
-        "Padis Store": "https://www.padis-store.com/en/443-riftbound-league-of-legends-tcg",
-        "Madrid Norte TCG": "https://madridnortetcg.com/en/collections/riftbound-tcg",
+        "Padis Store": (
+            "https://www.padis-store.com/en/443-riftbound-league-of-legends-tcg"
+        ),
+        "Madrid Norte TCG": (
+            "https://madridnortetcg.com/en/collections/riftbound-tcg"
+        ),
         "Metamorph Center": "https://metamorphcenter.com",
         "El Duelista": "https://elduelista.com",
         "Ninpo Store": "https://ninpostore.com",
@@ -66,7 +115,9 @@ ALL_STORES = {
         "Generación X Carranza": "https://generacionx.es",
         "Kingdom Wargames": "https://kingdomwargames.es",
         "Tempest Store": "https://tempeststore.es",
-        "OZ Juegos": "https://ozjuegos.com/categoria-producto/juegos-de-cartas/riftbound-league-of-legends-tcg/",
+        "OZ Juegos": (
+            "https://ozjuegos.com/categoria-producto/juegos-de-cartas/riftbound-league-of-legends-tcg/"
+        ),
         "Júpiter Juegos": "https://jupiterjuegos.com",
     },
     "Spagna - Negozi Specializzati & Catene (Gruppo 2)": {
@@ -78,7 +129,9 @@ ALL_STORES = {
         "Estalia Games": "https://estaliagames.com",
         "La Forja": "https://laforjajuegos.com",
         "CardCrack": "https://cardcrack.es",
-        "Empire Games": "https://www.empiregames.es/categoria-producto/juegos-de-cartas-coleccionables/league-of-legends-tcg-riftbound/",
+        "Empire Games": (
+            "https://www.empiregames.es/categoria-producto/juegos-de-cartas-coleccionables/league-of-legends-tcg-riftbound/"
+        ),
         "A Dado y Pluma": "https://adadoypluma.com",
         "Unchained Games": "https://unchainedgames.es",
         "Tini Games": "https://tinigames.es",
@@ -144,7 +197,9 @@ ALL_STORES = {
         "Manavortex": "https://manavortex.es",
         "Merchfox": "https://merchfox.com",
         "Minas de Moria": "https://minasdemoria.com",
-        "Mono de Juegos": "https://www.monodejuegos.shop/categoria-producto/trading-cards/riftbound/",
+        "Mono de Juegos": (
+            "https://www.monodejuegos.shop/categoria-producto/trading-cards/riftbound/"
+        ),
         "Monsters Collectors": "https://monsterscollectors.com",
         "Otakura": "https://otakura.com",
         "Otakuya": "https://otakuya.es",
@@ -279,200 +334,338 @@ ALL_STORES = {
         "OP Shop Milano": "https://opshop.it",
         "Manicomix": "https://www.manicomix.com",
         "Manicomix Distribuzione": "https://www.manicomix.com",
-    }
+    },
 }
 
+
 def manda_notifica_telegram(testo):
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        return
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": TELEGRAM_CHAT_ID,
-        "text": testo,
-        "parse_mode": "Markdown"
-    }
-    try:
-        requests.post(url, json=payload, timeout=10)
-    except Exception as e:
-        print(f"Errore invio Telegram: {e}")
+  if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+    return
+  url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+  payload = {"chat_id": TELEGRAM_CHAT_ID, "text": testo, "parse_mode": "Markdown"}
+  try:
+    requests.post(url, json=payload, timeout=10)
+  except Exception as e:
+    print(f"Errore invio Telegram: {e}")
+
 
 def check_store_stock(store_name, url):
-    print(f"[*] Analizzando store ({store_name}) -> {url}")
-    try:
-        response = requests.get(url, headers=HEADERS, timeout=8)
-        if response.status_code != 200:
-            return []
+  print(f"[*] Analizzando store ({store_name}) -> {url}")
+  try:
+    response = requests.get(url, headers=HEADERS, timeout=8)
+    if response.status_code != 200:
+      return []
 
-        html = response.text
-        if "myshopify.com" in html or "shopifycdn.com" in html or "Shopify.shop" in html:
-            print(f"[-] Escluso {store_name}: Piattaforma Shopify rilevata.")
-            return []
+    html = response.text
+    if (
+        "myshopify.com" in html
+        or "shopifycdn.com" in html
+        or "Shopify.shop" in html
+    ):
+      print(f"[-] Escluso {store_name}: Piattaforma Shopify rilevata.")
+      return []
 
-        soup = BeautifulSoup(html, "html.parser")
-        found_products = []
-        seen_urls = set()
+    soup = BeautifulSoup(html, "html.parser")
+    found_products = []
+    seen_urls = set()
 
-        product_items = soup.find_all(
-            ["div", "li", "article"], class_=lambda x: x and any(term in x.lower() for term in ["product", "item", "card", "grid", "prodotto"])
-        )
-        if not product_items:
-            product_items = soup.find_all("div", class_=lambda x: x and ("col" in x.lower() or "box" in x.lower()))
+    product_items = soup.find_all(
+        ["div", "li", "article"],
+        class_=lambda x: x
+        and any(
+            term in x.lower()
+            for term in ["product", "item", "card", "grid", "prodotto"]
+        ),
+    )
+    if not product_items:
+      product_items = soup.find_all(
+          "div",
+          class_=lambda x: x and ("col" in x.lower() or "box" in x.lower()),
+      )
 
-        for item in product_items:
-            title_elem = item.find(["h2", "h3", "a"], class_=lambda x: x and ("title" in x.lower() or "name" in x.lower() or "prodotto" in x.lower()))
-            if not title_elem:
-                title_elem = item.find("a")
+    for item in product_items:
+      title_elem = item.find(
+          ["h2", "h3", "a"],
+          class_=lambda x: x
+          and (
+              "title" in x.lower()
+              or "name" in x.lower()
+              or "prodotto" in x.lower()
+          ),
+      )
+      if not title_elem:
+        title_elem = item.find("a")
 
-            if not title_elem:
-                continue
+      if not title_elem:
+        continue
 
-            product_title = title_elem.get_text(strip=True)
-            product_link = title_elem.get("href", "") if title_elem.name == "a" else (item.find("a")["href"] if item.find("a") else "")
-            
-            if product_link and product_link.startswith("/"):
-                base_url = "/".join(url.split("/")[:3])
-                product_link = base_url + product_link
+      product_title = title_elem.get_text(strip=True)
+      product_link = (
+          title_elem.get("href", "")
+          if title_elem.name == "a"
+          else (item.find("a")["href"] if item.find("a") else "")
+      )
 
-            if not product_link or product_link in seen_urls:
-                continue
+      if product_link and product_link.startswith("/"):
+        base_url = "/".join(url.split("/")[:3])
+        product_link = base_url + product_link
 
-            title_lower = product_title.lower()
-            item_text = item.get_text().lower()
+      if not product_link or product_link in seen_urls:
+        continue
 
-            if "riftbound" not in title_lower and "riftbound" not in item_text:
-                continue
-            
-            if any(f in title_lower or f in item_text for f in [r.lower() for r in FORBIDDEN_SETS]):
-                continue    
-                
-            lingue_da_escludere = [
-                "italiano", "italian", "italienne",
-                "español", "spanish", "espanol", "castellano", 
-                "francais", "french", "français", 
-                "deutsch", "german", "alemán", 
-                "chinese", "chino", "中文", "日本語", "japanese"
+      title_lower = product_title.lower()
+      item_text = item.get_text().lower()
+
+      if "riftbound" not in title_lower and "riftbound" not in item_text:
+        continue
+
+      if any(
+          f in title_lower or f in item_text
+          for f in [r.lower() for r in FORBIDDEN_SETS]
+      ):
+        continue
+
+      lingue_da_escludere = [
+          "italiano",
+          "italian",
+          "italienne",
+          "español",
+          "spanish",
+          "espanol",
+          "castellano",
+          "francais",
+          "french",
+          "français",
+          "deutsch",
+          "german",
+          "alemán",
+          "chinese",
+          "chino",
+          "中文",
+          "日本語",
+          "japanese",
+      ]
+      if any(lang in title_lower or lang in item_text for lang in lingue_da_escludere):
+        continue
+
+      if (
+          "lingua" in item_text
+          or "language" in item_text
+          or "idioma" in item_text
+      ):
+        if (
+            "ital" in item_text
+            or "frances" in item_text
+            or "allemand" in item_text
+            or "alemán" in item_text
+            or "chino" in item_text
+            or "espan" in item_text
+        ):
+          if (
+              "english" not in item_text
+              and "inglese" not in item_text
+              and "ingles" not in item_text
+          ):
+            continue
+
+      if any(
+          bad in title_lower
+          for bad in [
+              "starter deck",
+              "showdown deck",
+              "champion deck",
+              "5 buste",
+              "5 packs",
+              "blister",
+              "vault",
+              "proving grounds",
+              "sanctum",
+              "bundle",
+          ]
+      ):
+        continue
+
+      matched_set = None
+      full_search_text = title_lower + " " + item_text
+      for s in ALLOWED_SETS:
+        if s.lower() in full_search_text:
+          matched_set = s
+          break
+
+      if not matched_set:
+        continue
+
+      is_case = any(
+          term in full_search_text for term in PRODUCT_KEYWORDS["case"]
+      )
+      is_display_24 = any(
+          term in full_search_text for term in PRODUCT_KEYWORDS["display_24"]
+      )
+
+      if is_case:
+        product_type = "CASE (6x Booster Box)"
+      elif is_display_24:
+        product_type = "CAJA SUELTA (24 Booster Display)"
+      else:
+        continue
+
+      seen_urls.add(product_link)
+
+      is_exhausted = any(term in item_text for term in TERMINI_ESAURITO)
+      badges = item.find_all(
+          class_=lambda x: x
+          and any(
+              b in x.lower()
+              for b in [
+                  "agotado",
+                  "esaurito",
+                  "sold-out",
+                  "out-of-stock",
+                  "disabled",
+              ]
+          )
+      )
+      if badges:
+        for badge in badges:
+          if any(
+              t in badge.get_text().lower()
+              for t in [
+                  "agotado",
+                  "esaurito",
+                  "sold out",
+                  "sin stock",
+                  "non disponibile",
+              ]
+          ):
+            is_exhausted = True
+            break
+
+      buy_button = item.find(
+          ["button", "a", "input"],
+          class_=lambda x: x
+          and any(
+              b in x.lower()
+              for b in [
+                  "add",
+                  "comprar",
+                  "cart",
+                  "btn",
+                  "acquista",
+                  "carrello",
+              ]
+          ),
+      )
+      if buy_button:
+        btn_text = buy_button.get_text().lower()
+        if any(
+            t in btn_text
+            for t in [
+                "agotado",
+                "esaurito",
+                "sold out",
+                "avísame",
+                "avvisami",
+                "reservar",
+                "prenota",
             ]
-            if any(lang in title_lower or lang in item_text for lang in lingue_da_escludere):
-                continue
+        ):
+          is_exhausted = True
+        if buy_button.has_attr("disabled"):
+          is_exhausted = True
 
-            if "lingua" in item_text or "language" in item_text or "idioma" in item_text:
-                if "ital" in item_text or "frances" in item_text or "allemand" in item_text or "alemán" in item_text or "chino" in item_text or "espan" in item_text:
-                    if "english" not in item_text and "inglese" not in item_text and "ingles" not in item_text:
-                        continue
+      if is_exhausted:
+        continue
 
-            if any(bad in title_lower for bad in ["starter deck", "showdown deck", "champion deck", "5 buste", "5 packs", "blister", "vault", "proving grounds", "sanctum", "bundle"]):
-                continue
+      price_elem = item.find(class_=lambda x: x and "price" in x.lower())
+      price = (
+          price_elem.get_text(strip=True)
+          if price_elem
+          else "Prezzo non trovato"
+      )
 
-            matched_set = None
-            full_search_text = title_lower + " " + item_text
-            for s in ALLOWED_SETS:
-                if s.lower() in full_search_text:
-                    matched_set = s
-                    break
-            
-            if not matched_set:
-                continue
+      found_products.append({
+          "store": store_name,
+          "url": product_link,
+          "set": matched_set,
+          "type": product_type,
+          "title": product_title,
+          "price": price,
+          "status": "DISPONIBILE",
+      })
 
-            is_case = any(term in full_search_text for term in PRODUCT_KEYWORDS["case"])
-            is_display_24 = any(term in full_search_text for term in PRODUCT_KEYWORDS["display_24"])
+    return found_products
+  except Exception as e:
+    return []
 
-            if is_case:
-                product_type = "CASE (6x Booster Box)"
-            elif is_display_24:
-                product_type = "CAJA SUELTA (24 Booster Display)"
-            else:
-                continue
-
-            seen_urls.add(product_link)
-
-            is_exhausted = any(term in item_text for term in TERMINI_ESAURITO)
-            badges = item.find_all(class_=lambda x: x and any(b in x.lower() for b in ["agotado", "esaurito", "sold-out", "out-of-stock", "disabled"]))
-            if badges:
-                for badge in badges:
-                    if any(t in badge.get_text().lower() for t in ["agotado", "esaurito", "sold out", "sin stock", "non disponibile"]):
-                        is_exhausted = True
-                        break
-
-            buy_button = item.find(["button", "a", "input"], class_=lambda x: x and any(b in x.lower() for b in ["add", "comprar", "cart", "btn", "acquista", "carrello"]))
-            if buy_button:
-                btn_text = buy_button.get_text().lower()
-                if any(t in btn_text for t in ["agotado", "esaurito", "sold out", "avísame", "avvisami", "reservar", "prenota"]):
-                    is_exhausted = True
-                if buy_button.has_attr("disabled"):
-                    is_exhausted = True
-
-            if is_exhausted:
-                continue  
-
-            price_elem = item.find(class_=lambda x: x and "price" in x.lower())
-            price = price_elem.get_text(strip=True) if price_elem else "Prezzo non trovato"
-
-            found_products.append({
-                "store": store_name,
-                "url": product_link,
-                "set": matched_set,
-                "type": product_type,
-                "title": product_title,
-                "price": price,
-                "status": "DISPONIBILE",
-            })
-
-        return found_products
-    except Exception as e:
-        return []
 
 def process_store(region, store_name, store_url):
-    results = check_store_stock(store_name, store_url)
-    available = [p for p in results if "DISPONIBILE" in p["status"] or "EN STOCK" in p["status"]]
-    return region, available
+  results = check_store_stock(store_name, store_url)
+  available = [
+      p
+      for p in results
+      if "DISPONIBILE" in p["status"] or "EN STOCK" in p["status"]
+  ]
+  return region, available
+
 
 if __name__ == "__main__":
-    print("=== Avvio scansione totale SPAGNA + ITALIA (SOLO INGLESE) ===")
-    report_by_region = {}
-    
-    with ThreadPoolExecutor(max_workers=15) as executor:
-        futures = []
-        for region, stores in ALL_STORES.items():
-            for store_name, store_url in stores.items():
-                futures.append(executor.submit(process_store, region, store_name, store_url))
+  print("=== Avvio scansione totale SPAGNA + ITALIA (SOLO INGLESE) ===")
+  report_by_region = {}
 
-        for future in as_completed(futures):
-            region, available = future.result()
-            if available:
-                if region not in report_by_region:
-                    report_by_region[region] = []
-                report_by_region[region].extend(available)
+  with ThreadPoolExecutor(max_workers=15) as executor:
+    futures = []
+    for region, stores in ALL_STORES.items():
+      for store_name, store_url in stores.items():
+        futures.append(
+            executor.submit(process_store, region, store_name, store_url)
+        )
 
-    report_content = f"# REPORT DISPONIBILITÀ RIFTBOUND (SPAGNA + ITALIA - SOLO INGLESE)\n\n"
-    report_content += f"*Data e ora scansione:* {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-    report_content += "---\n\n"
-    
-    messaggio_telegram = "🚨 *RIFTBOUND ALERT: PRODOTTI DISPONIBILI!* 🚨\n\n"
-    trovati_prodotti = False
+    for future in as_completed(futures):
+      region, available = future.result()
+      if available:
+        if region not in report_by_region:
+          report_by_region[region] = []
+        report_by_region[region].extend(available)
 
-    if not report_by_region:
-        report_content += "Nessun prodotto trovato.\n"
-    else:
-        for region, products in report_by_region.items():
-            report_content += f"## 📍 {region}\n\n"
-            messaggio_telegram += f"*{region}*\n"
-            for prod in products:
-                trovati_prodotti = True
-                report_content += f"### [{prod['store']}]({prod['url']})\n"
-                report_content += f"- **Set:** {prod['set']}\n"
-                report_content += f"- **Formato:** {prod['type']}\n"
-                report_content += f"- **Prezzo:** {prod['price']}\n\n"
-                report_content += "---\n\n"
-                
-                messaggio_telegram += f"• [{prod['store']}]({prod['url']}) - *{prod['set']}* ({prod['price']})\n"
-            messaggio_telegram += "\n"
+  report_content = (
+      "# REPORT DISPONIBILITÀ RIFTBOUND (SPAGNA + ITALIA - SOLO INGLESE)\n\n"
+  )
+  report_content += (
+      f"*Data e ora scansione:* {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+  )
+  report_content += "---\n\n"
 
-    file_name = "report_riftbound_spagna_italia_inglese.md"
-        with open(file_name, "w", encoding="utf-8") as f:
-            f.write(report_content)
+  messaggio_telegram = "🚨 *RIFTBOUND ALERT: PRODOTTI DISPONIBILI!* 🚨\n\n"
+  trovati_prodotti = False
 
-        if trovati_prodotti:
-            manda_notifica_telegram(messaggio_telegram)
-            print("[OK] Prodotti trovati! Notifica inviata su Telegram.")
-        else:
-            print("[INFO] Nessun prodotto disponibile in questo momento. Telegram non disturbato.")
+  if not report_by_region:
+    report_content += "Nessun prodotto trovato.\n"
+  else:
+    for region, products in report_by_region.items():
+      report_content += f"## 📍 {region}\n\n"
+      messaggio_telegram += f"*{region}*\n"
+      for prod in products:
+        trovati_prodotti = True
+        report_content += f"### [{prod['store']}]({prod['url']})\n"
+        report_content += f"- **Set:** {prod['set']}\n"
+        report_content += f"- **Formato:** {prod['type']}\n"
+        report_content += f"- **Prezzo:** {prod['price']}\n\n"
+        report_content += "---\n\n"
+
+        messaggio_telegram += (
+            f"• [{prod['store']}]({prod['url']}) - *{prod['set']}* ({prod['price']})\n"
+        )
+      messaggio_telegram += "\n"
+
+  file_name = "report_riftbound_spagna_italia_inglese.md"
+  with open(file_name, "w", encoding="utf-8") as f:
+    f.write(report_content)
+
+  if trovati_prodotti:
+    manda_notifica_telegram(messaggio_telegram)
+    print("[OK] Prodotti trovati! Notifica inviata su Telegram.")
+  else:
+    print(
+        "[INFO] Nessun prodotto disponibile in questo momento. Telegram non"
+        " disturbato."
+    )
