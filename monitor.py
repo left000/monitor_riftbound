@@ -463,4 +463,3 @@ if __name__ == "__main__":
         f.write(report_content)
 
     print(f"\n[OK] Scansione completata per Spagna e Italia! Salvato in '{file_name}'.")
-    input("\nPremi INVIO per chiudere la finestra...")
