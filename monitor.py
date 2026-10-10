@@ -468,4 +468,11 @@ if __name__ == "__main__":
             messaggio_telegram += "\n"
 
     file_name = "report_riftbound_spagna_italia_inglese.md"
-    with open(file_name, "w", encoding="utf-8") as f:
+        with open(file_name, "w", encoding="utf-8") as f:
+            f.write(report_content)
+
+        if trovati_prodotti:
+            manda_notifica_telegram(messaggio_telegram)
+            print("[OK] Prodotti trovati! Notifica inviata su Telegram.")
+        else:
+            print("[INFO] Nessun prodotto disponibile in questo momento. Telegram non disturbato.")
