@@ -340,13 +340,23 @@ ALL_STORES = {
 
 def manda_notifica_telegram(testo):
   if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-    return
+    print(
+        "[!] Errore Telegram: Token o Chat ID mancanti tra le variabili"
+        " d'ambiente."
+    )
+    return False
   url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
   payload = {"chat_id": TELEGRAM_CHAT_ID, "text": testo, "parse_mode": "Markdown"}
   try:
-    requests.post(url, json=payload, timeout=10)
+    res = requests.post(url, json=payload, timeout=10)
+    data = res.json()
+    if not data.get("ok"):
+      print(f"[!] Errore da Telegram API: {data.get('description')}")
+      return False
+    return True
   except Exception as e:
-    print(f"Errore invio Telegram: {e}")
+    print(f"[!] Errore di connessione a Telegram: {e}")
+    return False
 
 
 def check_store_stock(store_name, url):
@@ -662,8 +672,14 @@ if __name__ == "__main__":
     f.write(report_content)
 
   if trovati_prodotti:
-    manda_notifica_telegram(messaggio_telegram)
-    print("[OK] Prodotti trovati! Notifica inviata su Telegram.")
+    inviato = manda_notifica_telegram(messaggio_telegram)
+    if inviato:
+      print("[OK] Prodotti trovati e notifica inviata su Telegram!")
+    else:
+      print(
+          "[!] Prodotti trovati ma invio Telegram FALLITO. Controlla il log"
+          " sopra."
+      )
   else:
     print(
         "[INFO] Nessun prodotto disponibile in questo momento. Telegram non"
