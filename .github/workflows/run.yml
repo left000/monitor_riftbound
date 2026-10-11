@@ -2,8 +2,8 @@ name: Monitor Riftbound Stock
 
 on:
   schedule:
-    # Esegue lo script automaticamente ogni 2 ore
-    - cron: '0 */2 * * *'
+    # Esegue lo script due volte al giorno: alle 12:00 e alle 17:00 UTC
+    - cron: '0 12,17 * * *'
   workflow_dispatch:
 
 jobs:
