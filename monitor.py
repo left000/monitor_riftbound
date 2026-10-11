@@ -3,19 +3,10 @@
 
 Per ogni negozio:
   1. rileva la piattaforma (Shopify, WooCommerce, PrestaShop, Magento, altro)
-  2. cerca i prodotti con l'API della piattaforma (se esiste) e/o con la
-     pagina di ricerca HTML (prova automaticamente più URL possibili)
+  2. compone l'URL di ricerca in autonomia partendo dalla home pulita
   3. filtra: solo Booster Box (24) e Case (6x) dei set ammessi, in inglese
   4. verifica lo stock sulla pagina del prodotto con PROVA POSITIVA
   5. manda su Telegram solo i prodotti realmente acquistabili
-
-Variabili d'ambiente:
-  TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID   obbligatorie per le notifiche
-  DEBUG=1                                log dettagliato dei motivi di scarto
-  MAX_WORKERS=12                         negozi analizzati in parallelo
-  NOTIFY_ONLY_NEW=1                      avvisa solo per prodotti nuovi
-  STATE_FILE=state.json                  file di stato per NOTIFY_ONLY_NEW
-  CACHE_FILE=stores_cache.json           cache degli URL di ricerca trovati
 """
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import html as htmllib
@@ -53,14 +44,10 @@ HEADERS = {
 ALLOWED_SETS = ["Origins", "Spiritforged", "Unleashed", "Vendetta"]
 FORBIDDEN_SETS = ["Radiance"]
 
-# Prezzi minimi plausibili (EUR): sotto questa soglia il prodotto è scartato
 MIN_PRICE = {"display": 50.0, "case": 250.0}
-
 QUERIES = ["riftbound booster box", "riftbound display", "riftbound case"]
-
 IN_STOCK_SCHEMA = ("instock", "limitedavailability", "onlineonly")
 
-# Testi (su bottoni o pagine) che indicano NON acquistabile adesso
 TERMINI_ESAURITO = [
     "agotado", "agotados", "sold out", "sin stock", "no disponible",
     "out of stock", "unavailable", "sin existencias", "existencias insuficientes",
@@ -105,8 +92,6 @@ SEARCH_PATHS_PRESTA = [
     "/ricerca?controller=search&s=riftbound",
     "/buscar?controller=search&s=riftbound",
     "/busqueda?controller=search&s=riftbound",
-    "/it/cerca?controller=search&s=riftbound",
-    "/es/buscar?controller=search&s=riftbound",
 ]
 SEARCH_PATHS = {
     "shopify": ["/search?q=riftbound&type=product"],
@@ -117,7 +102,7 @@ SEARCH_PATHS = {
 SEARCH_PATHS_GENERIC = (
     ["/search?q=riftbound", "/?s=riftbound&post_type=product",
      "/catalogsearch/result/?q=riftbound"]
-    + SEARCH_PATHS_PRESTA[:5]
+    + SEARCH_PATHS_PRESTA[:3]
     + ["/search.php?search_query=riftbound"]
 )
 
@@ -127,19 +112,148 @@ NON_PRODUCT_PATH = [
 ]
 
 # --------------------------------------------------------------------------
-# Negozi. L'URL è solo un "suggerimento": lo script rileva da solo
-# la piattaforma e prova più URL di ricerca. Per aggiungere un negozio
-# basta una riga con la home (o la pagina collezione Riftbound).
+# Lista completa dei Negozi (con link puliti alla home)
 # --------------------------------------------------------------------------
-# --------------------------------------------------------------------------
-# Negozi VERIFICATI: ho trovato prodotti Riftbound (box/display) reali in
-# vendita su questi siti con una ricerca web. Hanno la priorità.
-# Basta la home: lo script rileva da solo piattaforma e URL di ricerca.
-# --------------------------------------------------------------------------
-STORES_VERIFICATI = {
+STORES = {
+    "Spagna": {
+        "Factory Cards TCG": "https://factorycardstcg.com/",
+        "TopDeck": "https://topdeck.es/",
+        "Zial TCG": "https://www.zialtcg.com/",
+        "Ninpo Store": "https://ninpostore.com/",
+        "La Cueva Roja": "https://lacuevaroja.com/",
+        "Magic Event GN": "https://www.magiceventgn.com/",
+        "Ingenio BCN": "https://ingeniobcn.es/",
+        "Monarka TCG": "https://monarkatcg.store/",
+        "Padis Store": "https://www.padisl5r.com/",
+        "Empire Games": "https://www.empiregames.es/",
+        "Ateneo Comics": "https://www.ateneocomics.com/",
+        "Nymeria Comics": "https://www.nymeriacomics.com/",
+        "Tempest Store": "https://www.tempeststore.com/",
+        "Paladin Store": "https://paladinstore.es/",
+        "Pulsar Store": "https://pulsarstore.com/",
+        "Manavortex": "https://manavortex.es/",
+        "La Forja de Cartas": "https://www.laforjadecartas.com/",
+        "La Escotilla Juegos": "https://laescotillajuegos.com/",
+        "La Jugonzona": "https://www.lajugonzona.shop/",
+        "Warlotus": "https://warlotus.com/",
+        "TCG Mansion": "https://tcgmansion.com/",
+        "TCG Factory": "https://tcgfactory.com/",
+        "Panda Games": "https://pandagames.es/",
+        "OZ Juegos": "https://www.ozjuegos.com/",
+        "Hero Freaks": "https://www.herofreaks.com/",
+        "HoloPlaza TCG": "https://holoplazatcg.com/",
+        "AllInTCG": "https://allintcg.com/",
+        "Dungeon Marvels": "https://dungeonmarvels.com/",
+        "JJCollection": "https://www.jjcollection.es/",
+        "Montalfan": "https://montalfan.com/",
+        "El Duelista": "https://elduelista.com/",
+        "Puerto Fantasy": "https://www.puertofantasy.es/",
+        "Don Mazo": "https://www.donmazo.com/",
+        "Madrid Norte TCG": "https://madridnortetcg.com/",
+        "Shark Games": "https://sharkgames.es/",
+        "Rebellion": "https://rebellion.es/",
+        "TCG Parada": "https://www.tcgparada.com/",
+        "TPK Hobby Games": "https://www.tpkhobby.es/",
+        "Epic Hit Store": "https://www.epichitstore.es/",
+        "Estalia Córdoba": "https://estaliacordoba.com/",
+        "Metamorph Center": "https://metamorphcenter.com/",
+        "Shiny Hit": "https://shinyhit.com/",
+        "TCG Multiverse": "https://www.tcgmultiverse.es/",
+        "Colossal Store": "https://www.colossalstore.es/",
+        "El Orco Rojo": "https://www.elorcorojo.com/",
+        "Generación X": "https://www.generacionx.es/",
+        "Llibreria Kritik": "https://www.llibreriakritik.com/",
+        "Lorcanos": "https://www.lorcanos.com/",
+        "La Guarida Juegos": "https://laguaridajuegos.com/",
+        "City of Cards": "https://cityof.cards/",
+        "TCG Map Spain": "https://tcgmapspain.com/",
+        "Isekai Alcorcón": "https://isekai-alcorcon.es/",
+        "Velkarion": "https://velkarion.com/",
+        "Zacatrus": "https://zacatrus.es/",
+        "Metropolis Center": "https://metropolis-center.com/",
+        "Gameria": "https://gameria.es/",
+        "Super Collectors": "https://www.supercollectors.es/",
+        "Dracotienda": "https://dracotienda.com/",
+        "StarGeek": "https://www.stargeek.es/",
+        "CardZone": "https://cardzone.es/",
+        "Gigamesh": "https://gigamesh.com/",
+        "Saruman Games": "https://sarumangames.es/",
+        "Comic Stores": "https://comicstores.es/",
+        "Kanto Cards": "https://kantocards.com/",
+        "Pokemillon": "https://www.pokemillon.com/",
+        "La Torre Karin Store": "https://latorrekarinstore.es/",
+        "Ulduar": "https://www.ulduar.es/",
+        "Imperio Friki": "https://imperiofriki.com/",
+        "SunnyStore": "https://sunnystore.es/",
+        "The Golden Rabbit Shop": "https://thegoldenrabbitshop.es/",
+        "Otakuya TCG": "https://tcg.otakuya.es/",
+        "Hyker Card House": "https://hykercardhouse.com/",
+        "Grille Cards": "https://grillecards.com/",
+        "TCG Level": "https://tcglevel.com/",
+        "Wizard TCG": "https://www.wizardtcg.com/",
+        "TCG Academy": "https://www.tcgacademy.es/",
+        "Cosmic Blazar": "https://cosmicblazar.store/",
+        "Origen Juegos": "https://www.origenjuegos.com/",
+        "Three Stones Games": "https://threestonesgames.com/",
+        "Universe TCG": "https://universetcg.es/",
+        "GAME España": "https://www.game.es/",
+        "Arte 9": "https://arte9.com/",
+        "Troopertoys": "https://troopertoys.com/",
+        "EGD Games": "https://egdgames.com/",
+        "El Bastión del Sur": "https://www.elbastiondelsur.com/",
+        "Card Center": "https://cardcenter.es/",
+        "Friki Galaxy": "https://frikigalaxy.com/",
+        "Card Crack": "https://cardcrack.com/",
+        "Card Cosmos ES": "https://cardcosmos.es/",
+    },
     "Italia": {
+        "MOBA Store": "https://www.mobastore.it/",
+        "OP SHOP": "https://opshop.it/",
+        "Magic Store": "https://www.magicstore.it/",
+        "iWozGaming": "https://iwozgaming.it/",
+        "Golden Store Roma": "https://goldenstoreroma.it/",
+        "Magliana Nerd": "https://www.magliananerd.it/",
+        "Galactus": "https://galactus.it/",
+        "Games Inn": "https://www.gamesinn.it/",
+        "Games Time": "https://www.gamestime.it/",
+        "Goblin Srl": "https://www.goblin.it/",
+        "MagoMatto": "https://www.magomatto.com/",
+        "Cards Capital City": "https://cardscapitalcity.it/",
+        "Titan Gaming Center": "https://titangamingcenter.com/",
+        "IL REGNO": "https://ilregno.it/",
+        "ManaWeb": "https://manaweb.it/",
+        "La Tana delle Pulci": "https://latanadellepulci.it/",
+        "Dadi e Draghi": "https://www.dadiedraghi.com/",
+        "Spazio Nerd": "https://spazionerd.it/",
+        "Lost Legion": "https://lostlegion.it/",
+        "B Games Bologna": "https://bgamesbologna.it/",
+        "ONGAME": "https://ongame.it/",
+        "Funside": "https://www.funside.it/",
+        "Magicards": "https://magicards.it/",
+        "Toon Kingdom": "https://toonkingdom.it/",
+        "The Magic Spot": "https://themagicspot.it/",
+        "Star Shop": "https://www.starshop.it/",
+        "Firenze Comics and Games": "https://firenzecomicsandgames.it/",
+        "Carta Magna": "https://cartamagna.it/",
+        "The Realm": "https://therealm.it/",
+        "La Gilda": "https://lagildadibusto.it/",
+        "Dungeon Street": "https://dungeonstreet.it/",
+        "4X Trading": "https://4xtrading.it/",
+        "Il Covo del Nerd": "https://www.ilcovodelnerd.it/",
+        "Pryce": "https://pryce.it/",
+        "Teca Rara": "https://tecarara.it/",
+        "Zero One": "https://zero-one.it/",
+        "Anime Shop Italia": "https://animeshopitalia.it/",
+        "Magic Merchant": "https://www.magicmerchant.it/",
+        "Gameology": "https://www.gameology.it/",
+        "Arcano Games": "https://www.arcanogames.it/",
+        "Collector's Inn": "https://collectorsinn.it/",
+        "Sanctum TCG": "https://sanctumtcg.it/",
+        "TheManaShop": "https://themanashop.it/",
+        "Games Time Aversa": "https://gamestimeaversa.com/",
+        "Dadi e Mattoncini": "https://www.dadiemattoncini.it/",
+        "Magictime": "https://magictime.it/",
         "CarteMagic": "https://www.cartemagic.com/",
-        "Otakura": "https://otakura.com/",
         "Ziller Store": "https://www.zillerstore.it/",
         "MagicNerd": "https://magicnerd.it/",
         "1UP RM": "https://1uprm.com/",
@@ -151,175 +265,7 @@ STORES_VERIFICATI = {
         "Il Collezionista Impertinente": "https://ilcollezionistaimpertinente.com/",
         "Vendiloshop": "https://www.vendiloshop.it/",
     },
-    "Spagna": {
-        "Universe TCG": "https://www.universetcg.com/",
-        "Dungeon Marvels": "https://dungeonmarvels.com/",
-        "Gigamesh": "https://gigamesh.com/",
-        "La Escotilla Juegos": "https://laescotillajuegos.com/",
-        "Micelion Games": "https://miceliongames.com/",
-        "Manavortex": "https://manavortex.es/",
-        "Gameria": "https://gameria.es/",
-        "EGD Games": "https://egdgames.com/",
-        "El Bastión del Sur": "https://www.elbastiondelsur.com/",
-        "Card Center": "https://cardcenter.es/",
-        "Friki Galaxy": "https://frikigalaxy.com/",
-        "Card Crack": "https://cardcrack.com/",
-        "Card Cosmos ES": "https://cardcosmos.es/",
-    },
 }
-
-# --------------------------------------------------------------------------
-# Negozi DA VERIFICARE (lista originale): molti domini potrebbero non
-# esistere. Lo script li prova lo stesso, salta subito quelli morti e te li
-# elenca nel report finale così puoi toglierli.
-# --------------------------------------------------------------------------
-STORES_DA_VERIFICARE = {
-    "Spagna": {
-        "Factory Cards TCG": "https://factorycardstcg.com/search?q=riftbound",
-        "TopDeck": "https://topdeck.es/collections/all?q=riftbound",
-        "Zial TCG": "https://www.zialtcg.com/?s=riftbound&post_type=product",
-        "Ninpo Store": "https://ninpostore.com/search?q=riftbound",
-        "La Cueva Roja": "https://lacuevaroja.com/?s=riftbound&post_type=product",
-        "Magic Event GN": "https://www.magiceventgn.com/search?q=riftbound",
-        "Ingenio BCN": "https://ingeniobcn.es/search?q=riftbound",
-        "Monarka TCG": "https://monarkatcg.store/search?q=riftbound",
-        "Padis Store": "https://www.padisl5r.com/en/443-riftbound-league-of-legends-tcg",
-        "Empire Games": "https://www.empiregames.es/categoria-producto/juegos-de-cartas-coleccionables/league-of-legends-tcg-riftbound/",
-        "Ateneo Comics": "https://www.ateneocomics.com/?s=riftbound&post_type=product",
-        "Nymeria Comics": "https://www.nymeriacomics.com/?s=riftbound&post_type=product",
-        "Tempest Store": "https://www.tempeststore.com/search?q=riftbound",
-        "Paladin Store": "https://paladinstore.es/search?q=riftbound",
-        "Pulsar Store": "https://pulsarstore.com/search?q=riftbound",
-        "Manavortex": "https://manavortex.es/search?q=riftbound",
-        "La Forja de Cartas": "https://www.laforjadecartas.com/?s=riftbound&post_type=product",
-        "La Escotilla Juegos": "https://laescotillajuegos.com/?s=riftbound&post_type=product",
-        "La Jugonzona": "https://www.lajugonzona.shop/search?q=riftbound",
-        "Warlotus": "https://warlotus.com/search?q=riftbound",
-        "TCG Mansion": "https://tcgmansion.com/search?q=riftbound",
-        "TCG Factory": "https://tcgfactory.com/search?q=riftbound",
-        "Panda Games": "https://pandagames.es/search?q=riftbound",
-        "OZ Juegos": "https://www.ozjuegos.com/categoria-producto/juegos-de-cartas/riftbound-league-of-legends-tcg/",
-        "Hero Freaks": "https://www.herofreaks.com/search?q=riftbound",
-        "HoloPlaza TCG": "https://holoplazatcg.com/search?q=riftbound",
-        "AllInTCG": "https://allintcg.com/search?q=riftbound",
-        "Dungeon Marvels": "https://dungeonmarvels.com/catalogsearch/result/?q=riftbound",
-        "JJCollection": "https://www.jjcollection.es/search?q=riftbound",
-        "Montalfan": "https://montalfan.com/?s=riftbound&post_type=product",
-        "El Duelista": "https://elduelista.com/search?q=riftbound",
-        "Puerto Fantasy": "https://www.puertofantasy.es/?s=riftbound&post_type=product",
-        "Don Mazo": "https://www.donmazo.com/?s=riftbound&post_type=product",
-        "Madrid Norte TCG": "https://madridnortetcg.com/en/collections/riftbound-tcg",
-        "Shark Games": "https://sharkgames.es/search?q=riftbound",
-        "Rebellion": "https://rebellion.es/s?q=riftbound",
-        "TCG Parada": "https://www.tcgparada.com/search?q=riftbound",
-        "TPK Hobby Games": "https://www.tpkhobby.es/search?q=riftbound",
-        "Epic Hit Store": "https://www.epichitstore.es/search?q=riftbound",
-        "Estalia Córdoba": "https://estaliacordoba.com/?s=riftbound&post_type=product",
-        "Metamorph Center": "https://metamorphcenter.com/search?q=riftbound",
-        "Shiny Hit": "https://shinyhit.com/search?q=riftbound",
-        "TCG Multiverse": "https://www.tcgmultiverse.es/search?q=riftbound",
-        "Colossal Store": "https://www.colossalstore.es/search?q=riftbound",
-        "El Orco Rojo": "https://www.elorcorojo.com/?s=riftbound&post_type=product",
-        "Generación X": "https://www.generacionx.es/search?q=riftbound",
-        "Llibreria Kritik": "https://www.llibreriakritik.com/?s=riftbound&post_type=product",
-        "Lorcanos": "https://www.lorcanos.com/search?q=riftbound",
-        "La Guarida Juegos": "https://laguaridajuegos.com/search?q=riftbound",
-        "City of Cards": "https://cityof.cards/search?q=riftbound",
-        "Isekai Alcorcón": "https://isekai-alcorcon.es/search?q=riftbound",
-        "Velkarion": "https://velkarion.com/search?q=riftbound",
-        "Zacatrus": "https://zacatrus.es/catalogsearch/result/?q=riftbound",
-        "Metropolis Center": "https://metropolis-center.com/catalogsearch/result/?q=riftbound",
-        "Gameria": "https://gameria.es/76-league-of-legends-riftbound",
-        "Super Collectors": "https://www.supercollectors.es/search?q=riftbound",
-        "Dracotienda": "https://dracotienda.com/catalogsearch/result/?q=riftbound",
-        "StarGeek": "https://www.stargeek.es/search?q=riftbound",
-        "CardZone": "https://cardzone.es/collections/riftbound-league-of-legends",
-        "Gigamesh": "https://gigamesh.com/?s=riftbound&post_type=product",
-        "Saruman Games": "https://sarumangames.es/search?q=riftbound",
-        "Comic Stores": "https://comicstores.es/search?q=riftbound",
-        "Kanto Cards": "https://kantocards.com/search?q=riftbound",
-        "Pokemillon": "https://www.pokemillon.com/?s=riftbound&post_type=product",
-        "La Torre Karin Store": "https://latorrekarinstore.es/",
-        "Ulduar": "https://www.ulduar.es/?s=riftbound&post_type=product",
-        "Imperio Friki": "https://imperiofriki.com/?s=riftbound&post_type=product",
-        "SunnyStore": "https://sunnystore.es/search?q=riftbound",
-        "The Golden Rabbit Shop": "https://thegoldenrabbitshop.es/categoria-producto/riftbound/",
-        "Otakuya TCG": "https://tcg.otakuya.es/collections/tcg-de-riftbound",
-        "Hyker Card House": "https://hykercardhouse.com/marca/riftbound/",
-        "Grille Cards": "https://grillecards.com/search?q=riftbound",
-        "TCG Level": "https://tcglevel.com/collections/riftbound",
-        "Micelion Games": "https://miceliongames.com/product-category/juegos-tcg/",
-        "Wizard TCG": "https://www.wizardtcg.com/collections/rifbound",
-        "TCG Academy": "https://www.tcgacademy.es/riftbound/",
-        "Cosmic Blazar": "https://cosmicblazar.store/catalogo?game=rift",
-        "Origen Juegos": "https://www.origenjuegos.com/tienda/producto/riftbound-origins",
-        "Three Stones Games": "https://threestonesgames.com/collections/riftbound",
-        "Universe TCG": "https://universetcg.es/",
-    },
-    "Italia": {
-        "MOBA Store": "https://www.mobastore.it/?s=riftbound&post_type=product",
-        "OP SHOP": "https://opshop.it/?s=riftbound&post_type=product",
-        "iWozGaming": "https://iwozgaming.it/?s=riftbound&post_type=product",
-        "Golden Store Roma": "https://goldenstoreroma.it/?s=riftbound&post_type=product",
-        "Magliana Nerd": "https://www.magliananerd.it/?s=riftbound&post_type=product",
-        "Galactus": "https://galactus.it/?s=riftbound&post_type=product",
-        "Games Inn": "https://www.gamesinn.it/?s=riftbound&post_type=product",
-        "Games Time": "https://www.gamestime.it/?s=riftbound&post_type=product",
-        "Goblin Srl": "https://www.goblin.it/?s=riftbound&post_type=product",
-        "MagoMatto": "https://www.magomatto.com/?s=riftbound&post_type=product",
-        "Cards Capital City": "https://cardscapitalcity.it/?s=riftbound&post_type=product",
-        "Titan Gaming Center": "https://titangamingcenter.com/?s=riftbound&post_type=product",
-        "IL REGNO": "https://ilregno.it/?s=riftbound&post_type=product",
-        "ManaWeb": "https://manaweb.it/?s=riftbound&post_type=product",
-        "La Tana delle Pulci": "https://latanadellepulci.it/?s=riftbound&post_type=product",
-        "Dadi e Draghi": "https://www.dadiedraghi.com/?s=riftbound&post_type=product",
-        "Spazio Nerd": "https://spazionerd.it/?s=riftbound&post_type=product",
-        "Lost Legion": "https://lostlegion.it/?s=riftbound&post_type=product",
-        "B Games Bologna": "https://bgamesbologna.it/?s=riftbound&post_type=product",
-        "ONGAME": "https://ongame.it/?s=riftbound&post_type=product",
-        "Funside": "https://www.funside.it/?s=riftbound&post_type=product",
-        "Magicards": "https://magicards.it/?s=riftbound&post_type=product",
-        "Toon Kingdom": "https://toonkingdom.it/?s=riftbound&post_type=product",
-        "The Magic Spot": "https://themagicspot.it/?s=riftbound&post_type=product",
-        "Star Shop": "https://www.starshop.it/?s=riftbound&post_type=product",
-        "Firenze Comics and Games": "https://firenzecomicsandgames.it/?s=riftbound&post_type=product",
-        "Carta Magna": "https://cartamagna.it/?s=riftbound&post_type=product",
-        "The Realm": "https://therealm.it/?s=riftbound&post_type=product",
-        "La Gilda": "https://lagildadibusto.it/?s=riftbound&post_type=product",
-        "Dungeon Street": "https://dungeonstreet.it/?s=riftbound&post_type=product",
-        "4X Trading": "https://4xtrading.it/?s=riftbound&post_type=product",
-        "Il Covo del Nerd": "https://www.ilcovodelnerd.it/?s=riftbound&post_type=product",
-        "Pryce": "https://pryce.it/?s=riftbound&post_type=product",
-        "Teca Rara": "https://tecarara.it/?s=riftbound&post_type=product",
-        "Zero One": "https://zero-one.it/?s=riftbound&post_type=product",
-        "Anime Shop Italia": "https://animeshopitalia.it/?s=riftbound&post_type=product",
-        "Magic Merchant": "https://www.magicmerchant.it/catalog/advanced_search_result.php?keywords=riftbound",
-        "Gameology": "https://www.gameology.it/?s=riftbound&post_type=product",
-        "Arcano Games": "https://www.arcanogames.it/?s=riftbound&post_type=product",
-        "Collector's Inn": "https://collectorsinn.it/?s=riftbound&post_type=product",
-        "Sanctum TCG": "https://sanctumtcg.it/?s=riftbound&post_type=product",
-        "TheManaShop": "https://themanashop.it/?s=riftbound&post_type=product",
-    },
-}
-
-
-def _build_all_stores():
-    merged = {}
-    for source in (STORES_VERIFICATI, STORES_DA_VERIFICARE):
-        for country, stores in source.items():
-            bucket = merged.setdefault(country, {})
-            seen_domains = {urlparse(u).netloc.replace("www.", "") for u in bucket.values()}
-            for name, url in stores.items():
-                dom = urlparse(url).netloc.replace("www.", "")
-                if dom in seen_domains:
-                    continue  # stesso dominio già presente tra i verificati
-                bucket[name] = url
-                seen_domains.add(dom)
-    return merged
-
-
-ALL_STORES = _build_all_stores()
-
 
 # --------------------------------------------------------------------------
 # Utilità
@@ -328,9 +274,7 @@ def log(msg):
     if DEBUG:
         print(msg, flush=True)
 
-
 _local = threading.local()
-
 
 def _session():
     s = getattr(_local, "s", None)
@@ -348,14 +292,12 @@ def _session():
         _local.s = s
     return s
 
-
 def fetch(url, timeout=12):
     try:
         return _session().get(url, timeout=timeout, allow_redirects=True)
     except requests.RequestException as e:
         log(f"[net] {url} -> {type(e).__name__}")
         return None
-
 
 def to_float(s):
     s = str(s).strip().replace("\xa0", "").replace(" ", "")
@@ -371,11 +313,9 @@ def to_float(s):
     except ValueError:
         return None
 
-
 RE_PRICE = re.compile(
     r"(\d[\d.,]*\d|\d)\s*(?:€|EUR)|(?:€|EUR)\s*(\d[\d.,]*\d|\d)", re.IGNORECASE
 )
-
 
 def estrai_prezzo(elemento):
     if not elemento:
@@ -387,10 +327,8 @@ def estrai_prezzo(elemento):
     a, b = trovati[-1]
     return to_float(a or b)
 
-
 def fmt_price(p):
     return f"{p:.2f} €".replace(".", ",") if p is not None else "prezzo n/d"
-
 
 def es_pagina_prodotto(url):
     path = urlparse(url).path.lower()
@@ -398,12 +336,7 @@ def es_pagina_prodotto(url):
         return True
     return not any(x in path for x in NON_PRODUCT_PATH)
 
-
-# --------------------------------------------------------------------------
-# Classificazione dei prodotti (solo titolo + URL, mai il testo della pagina)
-# --------------------------------------------------------------------------
 def classify(title, url):
-    """Ritorna (set, tipo) oppure None se il prodotto non interessa."""
     path = urlparse(url).path
     text = f"{title} {path}".lower().replace("-", " ").replace("_", " ")
 
@@ -428,37 +361,25 @@ def classify(title, url):
         return matched, "display"
     return None
 
-
 TIPO_LABEL = {"case": "CASE (6x Box)", "display": "BOOSTER BOX (24 Display)"}
-
 
 def prezzo_plausibile(tipo, price):
     if price is None:
         return True
     return price >= MIN_PRICE[tipo]
 
-
-# --------------------------------------------------------------------------
-# Rilevamento piattaforma
-# --------------------------------------------------------------------------
 def detect_platform(html):
     low = html.lower()
     if "cdn.shopify.com" in low or "myshopify.com" in low or "shopify.theme" in low:
         return "shopify"
-    if "woocommerce" in low:
+    if "woocommerce" in low or "wp-content" in low:
         return "woocommerce"
     if "prestashop" in low or 'id="js-product-list' in low:
         return "prestashop"
     if "magento" in low or "mage/cookies" in low or "catalogsearch" in low:
         return "magento"
-    if "wp-content" in low:
-        return "woocommerce"
     return "generic"
 
-
-# --------------------------------------------------------------------------
-# Sorgenti di prodotti: API e HTML
-# --------------------------------------------------------------------------
 def api_shopify(base):
     items = {}
     for q in QUERIES:
@@ -485,7 +406,6 @@ def api_shopify(base):
                 "price": price,
             }
     return list(items.values())
-
 
 def api_woocommerce(base):
     url = f"{base}/wp-json/wc/store/v1/products?search=riftbound&per_page=100"
@@ -514,7 +434,6 @@ def api_woocommerce(base):
         except (ValueError, TypeError):
             continue
     return items
-
 
 def extract_from_html(html, page_url):
     soup = BeautifulSoup(html, "html.parser")
@@ -550,16 +469,8 @@ def extract_from_html(html, page_url):
         it.pop("_score", None)
     return list(out.values())
 
-
-# --------------------------------------------------------------------------
-# Verifica stock sulla pagina del prodotto (tri-state: True / False / None)
-#   True  = prova positiva di disponibilità
-#   False = prova esplicita di esaurito
-#   None  = nessuna prova (es. pagina caricata via JavaScript)
-# --------------------------------------------------------------------------
 def _norm_av(v):
     return str(v).lower().replace(" ", "").rsplit("/", 1)[-1]
-
 
 def _jsonld_nodes(soup):
     nodes = []
@@ -578,7 +489,6 @@ def _jsonld_nodes(soup):
                 stack.extend(n)
     return nodes
 
-
 def _availability_values(soup, nodes):
     vals = [_norm_av(n["availability"]) for n in nodes if isinstance(n.get("availability"), str)]
     for m in soup.find_all("meta", attrs={"property": re.compile(r"availability$", re.I)}):
@@ -589,7 +499,6 @@ def _availability_values(soup, nodes):
         if v:
             vals.append(_norm_av(v))
     return vals
-
 
 def _price_from_page(soup, nodes):
     for n in nodes:
@@ -607,11 +516,8 @@ def _price_from_page(soup, nodes):
     el = soup.find(class_=re.compile("price", re.I))
     return estrai_prezzo(el)
 
-
 def verifica_pagina(url):
     path = urlparse(url).path
-
-    # Shopify: endpoint .js con disponibilità e prezzo affidabili
     if "/products/" in path:
         p = urlparse(url)
         r = fetch(f"{p.scheme}://{p.netloc}{path.rstrip('/')}.js")
@@ -643,17 +549,14 @@ def verifica_pagina(url):
     nodes = _jsonld_nodes(soup)
     price = _price_from_page(soup, nodes)
 
-    # 1) dati strutturati
     avail = _availability_values(soup, nodes)
     if avail:
         return any(a in IN_STOCK_SCHEMA for a in avail), price, f"schema {avail}"
 
-    # 2) classi del body
     body_cls = " ".join(soup.body.get("class", [])).lower() if soup.body else ""
     if "outofstock" in body_cls or "out-of-stock" in body_cls:
         return False, price, "body class"
 
-    # 3) form + bottone di acquisto reale
     form = (
         soup.find("form", action=re.compile(r"/cart/add|add-to-cart|add_to_cart", re.I))
         or soup.find("form", id=re.compile(r"addtocart|add-to-cart", re.I))
@@ -675,10 +578,6 @@ def verifica_pagina(url):
         return False, price, f"bottone '{txt.strip()}'"
     return True, price, "bottone attivo"
 
-
-# --------------------------------------------------------------------------
-# Analisi di un singolo negozio
-# --------------------------------------------------------------------------
 def _merge(candidates, items):
     for it in items:
         if not it.get("url"):
@@ -694,10 +593,8 @@ def _merge(candidates, items):
         if len(it["title"]) > len(cur["title"]):
             cur["title"] = it["title"]
 
-
 def _has_classified(items):
     return any(classify(i["title"], i["url"]) for i in items)
-
 
 def process_store(country, name, hint, cached):
     info = {"name": name, "country": country, "platform": "?", "status": "ok",
@@ -710,10 +607,8 @@ def process_store(country, name, hint, cached):
 
     home = fetch(base + "/")
     if home is None:
-        # Nessuna risposta dalla home: provo anche l'URL indicato, se non
-        # risponde nemmeno quello il dominio è morto -> niente altre richieste.
         if fetch(hint) is None:
-            info["status"] = "DOMINIO MORTO (nessuna risposta di rete)"
+            info["status"] = "DOMINIO MORTO"
             info["platform"] = "-"
             print(f"[x] {name}: dominio non raggiungibile", flush=True)
             return country, [], info
@@ -728,7 +623,6 @@ def process_store(country, name, hint, cached):
 
     candidates = {}
 
-    # --- API della piattaforma ---
     if platform == "shopify":
         apis = [api_shopify]
     elif platform == "woocommerce":
@@ -740,11 +634,13 @@ def process_store(country, name, hint, cached):
     for fn in apis:
         _merge(candidates, fn(base))
 
-    # --- Pagine HTML ---
     priority = []
     if cached.get("search_url"):
         priority.append(cached["search_url"])
-    priority.append(hint)
+    if hint.rstrip("/") != base.rstrip("/"):
+        priority.append(hint)
+    
+    # Genera automaticamente i path di ricerca in base alla piattaforma
     fallback = [base + path for path in SEARCH_PATHS.get(platform, [])]
     fallback += [base + path for path in SEARCH_PATHS_GENERIC]
 
@@ -773,32 +669,25 @@ def process_store(country, name, hint, cached):
     if not candidates and info["status"] == "ok":
         info["status"] = "nessun risultato Riftbound"
 
-    # --- Filtro e verifica stock ---
     found = []
     for it in candidates.values():
         cl = classify(it["title"], it["url"])
         if not cl:
             continue
         if not es_pagina_prodotto(it["url"]):
-            log(f"[skip] {it['url']} -> non è una pagina prodotto")
             continue
         if it["in_stock"] is False:
-            log(f"[skip] {it['url']} -> esaurito (API)")
             continue
 
         set_name, tipo = cl
         stock, page_price, why = verifica_pagina(it["url"])
         if stock is None:
-            # senza prova dalla pagina, mi fido solo se l'API dice "disponibile"
             stock = bool(it["in_stock"])
-            why += " -> uso dato API" if stock else " -> nessuna prova"
-        log(f"[stock] {it['url']} -> {stock} ({why})")
         if not stock:
             continue
 
         price = page_price if page_price is not None else it["price"]
         if not prezzo_plausibile(tipo, price):
-            log(f"[skip] {it['url']} -> prezzo implausibile {price}")
             continue
 
         found.append({
@@ -809,19 +698,19 @@ def process_store(country, name, hint, cached):
     return country, found, info
 
 
-# --------------------------------------------------------------------------
-# Telegram
-# --------------------------------------------------------------------------
-def _invia_singolo(testo):
+def manda_notifica_telegram(testo):
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        print("[!] Errore Telegram: Token o Chat ID mancanti.")
+        return False
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": TELEGRAM_CHAT_ID,
         "text": testo,
-        "parse_mode": "HTML",
+        "parse_mode": "Markdown",
         "disable_web_page_preview": True,
     }
     try:
-        res = requests.post(url, json=payload, timeout=15)
+        res = requests.post(url, json=payload, timeout=10)
         data = res.json()
         if not data.get("ok"):
             print(f"[!] Errore Telegram API: {data.get('description')}")
@@ -832,116 +721,61 @@ def _invia_singolo(testo):
         return False
 
 
-def manda_notifica_telegram(righe):
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        print("[!] Errore Telegram: Token o Chat ID mancanti.")
-        return False
-    chunks, current = [], ""
-    for line in righe:
-        if len(current) + len(line) + 1 > 3800:
-            chunks.append(current)
-            current = ""
-        current += line + "\n"
-    if current.strip():
-        chunks.append(current)
-    return all([_invia_singolo(c) for c in chunks])
-
-
-def _load_json(path, default):
-    try:
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return default
-
-
-def _save_json(path, data):
-    try:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        print(f"[!] Impossibile salvare {path}: {e}")
-
-
-# --------------------------------------------------------------------------
-# Main
-# --------------------------------------------------------------------------
-def main():
-    print("=== Avvio scansione SPAGNA + ITALIA ===", flush=True)
-    cache = _load_json(CACHE_FILE, {})
-    new_cache = dict(cache)
-
-    all_found, infos = [], []
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:
-        futures = []
-        for country, stores in ALL_STORES.items():
-            for name, hint in stores.items():
-                futures.append(
-                    ex.submit(process_store, country, name, hint, cache.get(name, {}))
-                )
-        for fut in as_completed(futures):
-            try:
-                country, found, info = fut.result()
-            except Exception as e:
-                print(f"[!] Errore imprevisto: {e}")
-                continue
-            all_found.extend(found)
-            infos.append(info)
-            new_cache[info["name"]] = {
-                "platform": info["platform"], "search_url": info["search_url"],
-            }
-
-    _save_json(CACHE_FILE, new_cache)
-
-    # --- Report diagnostico (utile per capire quali negozi sistemare) ---
-    morti = [i for i in infos if i["status"].startswith("DOMINIO MORTO")]
-    ko = [i for i in infos if i["status"] != "ok" and i not in morti]
-    print(f"\nNegozi analizzati: {len(infos)} | morti: {len(morti)} | con problemi: {len(ko)}")
-    if morti:
-        print("\nDomini morti (da togliere da ALL_STORES):")
-        for i in sorted(morti, key=lambda x: x["name"]):
-            print(f"  - {i['name']}")
-        _save_json("negozi_morti.json", sorted(i["name"] for i in morti))
-    if ko:
-        print("\nNegozi con problemi:")
-        for i in sorted(ko, key=lambda x: x["name"]):
-            print(f"  - {i['name']} [{i['platform']}]: {i['status']}")
-
-    # --- Solo nuovi? ---
-    to_notify = all_found
-    if NOTIFY_ONLY_NEW:
-        prev = set(_load_json(STATE_FILE, []))
-        to_notify = [p for p in all_found if p["url"] not in prev]
-        _save_json(STATE_FILE, sorted({p["url"] for p in all_found}))
-
-    print(f"\nProdotti disponibili: {len(all_found)} (da notificare: {len(to_notify)})")
-    for p in all_found:
-        print(f"  [TROVATO] {p['store']} | {p['set']} | {p['type']} | {fmt_price(p['price'])}\n      {p['url']}")
-
-    if not to_notify:
-        print("[INFO] Nessun prodotto da notificare.")
-        return
-
-    righe = ["🚨 <b>RIFTBOUND ALERT: PRODOTTI DISPONIBILI!</b> 🚨", ""]
-    for country in ALL_STORES:
-        prods = sorted([p for p in to_notify if p["country"] == country],
-                       key=lambda x: (x["store"], x["set"]))
-        if not prods:
-            continue
-        righe.append(f"📍 <b>{htmllib.escape(country)}</b>")
-        for p in prods:
-            righe.append(
-                f"• <a href=\"{htmllib.escape(p['url'], quote=True)}\">"
-                f"{htmllib.escape(p['store'])}</a> - <b>{htmllib.escape(p['set'])}</b> "
-                f"({htmllib.escape(p['type'])}) → <b>{htmllib.escape(fmt_price(p['price']))}</b>"
-            )
-        righe.append("")
-
-    if manda_notifica_telegram(righe):
-        print("[OK] Notifica inviata su Telegram!")
-    else:
-        print("[!] Prodotti trovati ma invio Telegram FALLITO.")
-
-
 if __name__ == "__main__":
-    main()
+    print("=== Avvio scansione totale SPAGNA + ITALIA ===")
+    
+    cache = {}
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE, "r", encoding="utf-8") as f:
+                cache = json.load(f)
+        except Exception:
+            pass
+
+    report_by_region = {}
+    new_cache = {}
+
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = {}
+        for country, stores in STORES.items():
+            for name, hint in stores.items():
+                futures[executor.submit(process_store, country, name, hint, cache.get(name, {}))] = name
+
+        for future in as_completed(futures):
+            country, available, info = future.result()
+            if info.get("search_url"):
+                new_cache[info["name"]] = {"search_url": info["search_url"]}
+            if available:
+                if country not in report_by_region:
+                    report_by_region[country] = []
+                report_by_region[country].extend(available)
+
+    try:
+        with open(CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(new_cache, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+    messaggio_telegram = "🚨 *RIFTBOUND ALERT: PRODOTTI DISPONIBILI!* 🚨\n\n"
+    trovati_prodotti = False
+
+    if report_by_region:
+        for country, products in report_by_region.items():
+            messaggio_telegram += f"📍 *{country}*\n"
+            for prod in products:
+                trovati_prodotti = True
+                prezzo_str = fmt_price(prod['price'])
+                messaggio_telegram += (
+                    f"• [{prod['store']}]({prod['url']}) - *{prod['set']}* "
+                    f"({prod['type']}) -> *{prezzo_str}*\n"
+                )
+            messaggio_telegram += "\n"
+
+    if trovati_prodotti:
+        inviato = manda_notifica_telegram(messaggio_telegram)
+        if inviato:
+            print("[OK] Prodotti trovati e notifica inviata su Telegram!")
+        else:
+            print("[!] Prodotti trovati ma invio Telegram FALLITO.")
+    else:
+        print("[INFO] Nessun prodotto disponibile in questo momento.")
