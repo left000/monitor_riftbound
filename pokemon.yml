@@ -1,0 +1,29 @@
+name: Monitor Pokemon 30th Stock
+
+on:
+  schedule:
+    # Esegue lo script ogni 3 ore (sfasato di 15 minuti per non accavallarsi)
+    - cron: '15 */3 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-pokemon-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codice
+        uses: actions/checkout@v3
+
+      - name: Configurazione di Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Installazione dipendenze
+        run: |
+          pip install requests beautifulsoup4 urllib3
+
+      - name: Esecuzione dello script Pokemon
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python pokemon_30th_monitor.py
