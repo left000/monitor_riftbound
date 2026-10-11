@@ -400,11 +400,10 @@ def check_store_stock(store_name, url):
       else:
         continue
 
-      # --- CONTROLLO ESAURITO MIGLIORATO ---
+      # --- CONTROLLO ESAURITO RIGIDO ---
       is_exhausted = any(term in item_text for term in TERMINI_ESAURITO)
 
-      # Controlla tutti i bottoni/pulsanti all'interno dell'articolo per attributi "disabled" o testi esauriti
-      buttons = item.find_all(["button", "input", "a"])
+      buttons = item.find_all(["button", "input", "a", "span", "div"])
       for btn in buttons:
         btn_txt = btn.get_text().lower()
         if btn.has_attr("disabled") or any(
@@ -422,7 +421,6 @@ def check_store_stock(store_name, url):
           is_exhausted = True
           break
 
-      # Controlla classi CSS comuni di Shopify/WooCommerce per esaurito
       all_classes_str = " ".join(
           [
               cls
@@ -444,10 +442,14 @@ def check_store_stock(store_name, url):
 
       if is_exhausted:
         continue
-      # -------------------------------------
+      # ---------------------------------
 
       price_elem = item.find(class_=lambda x: x and "price" in x.lower())
       price = estrai_prezzo_pulito(price_elem)
+
+      # SCARTA SE IL PREZZO NON È VALIDO (EVITA FINTI PRODOTTI ESAURITI CON N/D)
+      if price == "N/D":
+        continue
 
       seen_urls.add(product_link)
 
