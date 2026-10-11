@@ -89,82 +89,126 @@ TERMINI_ESAURITO = [
 
 ALL_STORES = {
     "Spagna - Negozi & Specializzati": {
-        "Factory Cards TCG": "https://factorycardstcg.com/",
-        "TopDeck": "https://topdeck.es/",
-        "Zial TCG": "https://www.zialtcg.com/",
-        "Ninpo Store": "https://ninpostore.com/",
-        "La Cueva Roja": "https://lacuevaroja.com/",
-        "Magic Event GN": "https://www.magiceventgn.com/",
-        "Ingenio BCN": "https://ingeniobcn.es/",
-        "Monarka TCG": "https://monarkatcg.store/",
-        "Padis Store": "https://www.padisl5r.com/",
-        "Empire Games": "https://www.empiregames.es/",
-        "Ateneo Comics": "https://www.ateneocomics.com/",
-        "Nymeria Comics": "https://www.nymeriacomics.com/",
-        "Tempest Store": "https://www.tempeststore.com/",
-        "Paladin Store": "https://paladinstore.es/",
-        "Pulsar Store": "https://pulsarstore.com/",
-        "Manavortex": "https://manavortex.es/",
-        "La Forja de Cartas": "https://www.laforjadecartas.com/",
-        "La Escotilla Juegos": "https://laescotillajuegos.com/",
-        "La Jugonzona": "https://www.lajugonzona.shop/",
-        "Warlotus": "https://warlotus.com/",
-        "TCG Mansion": "https://tcgmansion.com/",
-        "TCG Factory": "https://tcgfactory.com/",
-        "Panda Games": "https://pandagames.es/",
-        "OZ Juegos": "https://www.ozjuegos.com/",
-        "Hero Freaks": "https://www.herofreaks.com/",
-        "HoloPlaza TCG": "https://holoplazatcg.com/",
-        "AllInTCG": "https://allintcg.com/",
-        "Dungeon Marvels": "https://www.dungeonmarvels.com/",
-        "JJCollection": "https://www.jjcollection.es/",
-        "Montalfan": "https://montalfan.com/",
-        "El Duelista": "https://www.elduelista.com/",
-        "Puerto Fantasy": "https://www.puertofantasy.es/",
-        "Don Mazo": "https://www.donmazo.com/",
-        "Madrid Norte TCG": "https://madridnortetcg.com/",
-        "Shark Games": "https://sharkgames.es/",
-        "Rebellion": "https://rebellion.es/",
-        "TCG Parada": "https://www.tcgparada.com/",
-        "TPK Hobby Games": "https://www.tpkhobbygames.com/",
-        "Epic Hit Store": "https://www.epichitstore.es/",
-        "Estalia Córdoba": "https://estaliacordoba.com/",
-        "Metamorph Center": "https://metamorphcenter.com/",
-        "Shiny Hit": "https://shinyhit.com/",
-        "TCG Multiverse": "https://www.tcgmultiverse.es/",
-        "Colossal Store": "https://www.colossalstore.es/",
-        "El Orco Rojo": "https://www.elorcorojo.com/",
-        "Generación X": "https://www.generacionx.es/",
-        "Llibreria Kritik": "https://www.llibreriakritik.com/",
-        "Lorcanos": "https://www.lorcanos.com/",
-        "La Guarida Juegos": "https://laguaridajuegos.com/",
-        "City of Cards": "https://cityof.cards/",
+        "Factory Cards TCG": (
+            "https://factorycardstcg.com/search?q=riftbound"
+        ),
+        "TopDeck": "https://topdeck.es/collections/all?q=riftbound",
+        "Zial TCG": "https://www.zialtcg.com/?s=riftbound&post_type=product",
+        "Ninpo Store": "https://ninpostore.com/search?q=riftbound",
+        "La Cueva Roja": "https://lacuevaroja.com/?s=riftbound&post_type=product",
+        "Magic Event GN": (
+            "https://www.magiceventgn.com/search?q=riftbound"
+        ),
+        "Ingenio BCN": "https://ingeniobcn.es/search?q=riftbound",
+        "Monarka TCG": "https://monarkatcg.store/search?q=riftbound",
+        "Padis Store": (
+            "https://www.padisl5r.com/en/443-riftbound-league-of-legends-tcg"
+        ),
+        "Empire Games": (
+            "https://www.empiregames.es/categoria-producto/juegos-de-cartas-coleccionables/league-of-legends-tcg-riftbound/"
+        ),
+        "Ateneo Comics": (
+            "https://www.ateneocomics.com/?s=riftbound&post_type=product"
+        ),
+        "Nymeria Comics": (
+            "https://www.nymeriacomics.com/?s=riftbound&post_type=product"
+        ),
+        "Tempest Store": "https://www.tempeststore.com/search?q=riftbound",
+        "Paladin Store": "https://paladinstore.es/search?q=riftbound",
+        "Pulsar Store": "https://pulsarstore.com/search?q=riftbound",
+        "Manavortex": "https://manavortex.es/search?q=riftbound",
+        "La Forja de Cartas": (
+            "https://www.laforjadecartas.com/?s=riftbound&post_type=product"
+        ),
+        "La Escotilla Juegos": (
+            "https://laescotillajuegos.com/?s=riftbound&post_type=product"
+        ),
+        "La Jugonzona": "https://www.lajugonzona.shop/search?q=riftbound",
+        "Warlotus": "https://warlotus.com/search?q=riftbound",
+        "TCG Mansion": "https://tcgmansion.com/search?q=riftbound",
+        "TCG Factory": "https://tcgfactory.com/search?q=riftbound",
+        "Panda Games": "https://pandagames.es/search?q=riftbound",
+        "OZ Juegos": (
+            "https://www.ozjuegos.com/categoria-producto/juegos-de-cartas/riftbound-league-of-legends-tcg/"
+        ),
+        "Hero Freaks": "https://www.herofreaks.com/search?q=riftbound",
+        "HoloPlaza TCG": "https://holoplazatcg.com/search?q=riftbound",
+        "AllInTCG": "https://allintcg.com/search?q=riftbound",
+        "Dungeon Marvels": (
+            "https://dungeonmarvels.com/catalogsearch/result/?q=riftbound"
+        ),
+        "JJCollection": "https://www.jjcollection.es/search?q=riftbound",
+        "Montalfan": (
+            "https://montalfan.com/?s=riftbound&post_type=product"
+        ),
+        "El Duelista": "https://elduelista.com/search?q=riftbound",
+        "Puerto Fantasy": (
+            "https://www.puertofantasy.es/?s=riftbound&post_type=product"
+        ),
+        "Don Mazo": "https://www.donmazo.com/?s=riftbound&post_type=product",
+        "Madrid Norte TCG": (
+            "https://madridnortetcg.com/en/collections/riftbound-tcg"
+        ),
+        "Shark Games": "https://sharkgames.es/search?q=riftbound",
+        "Rebellion": "https://rebellion.es/s?q=riftbound",
+        "TCG Parada": "https://www.tcgparada.com/search?q=riftbound",
+        "TPK Hobby Games": "https://www.tpkhobby.es/search?q=riftbound",
+        "Epic Hit Store": "https://www.epichitstore.es/search?q=riftbound",
+        "Estalia Córdoba": (
+            "https://estaliacordoba.com/?s=riftbound&post_type=product"
+        ),
+        "Metamorph Center": "https://metamorphcenter.com/search?q=riftbound",
+        "Shiny Hit": "https://shinyhit.com/search?q=riftbound",
+        "TCG Multiverse": "https://www.tcgmultiverse.es/search?q=riftbound",
+        "Colossal Store": "https://www.colossalstore.es/search?q=riftbound",
+        "El Orco Rojo": (
+            "https://www.elorcorojo.com/?s=riftbound&post_type=product"
+        ),
+        "Generación X": "https://www.generacionx.es/search?q=riftbound",
+        "Llibreria Kritik": (
+            "https://www.llibreriakritik.com/?s=riftbound&post_type=product"
+        ),
+        "Lorcanos": "https://www.lorcanos.com/search?q=riftbound",
+        "La Guarida Juegos": "https://laguaridajuegos.com/search?q=riftbound",
+        "City of Cards": "https://cityof.cards/search?q=riftbound",
         "TCG Map Spain": "https://tcgmapspain.com/",
-        "Isekai Alcorcón": "https://isekai-alcorcon.es/",
-        "Velkarion": "https://velkarion.com/",
-        "Zacatrus": "https://zacatrus.es/",
-        "Metropolis Center": "https://metropolis-center.com/",
-        "Gameria": "https://gameria.es/",
-        "Super Collectors": "https://www.supercollectors.es/",
-        "Dracotienda": "https://dracotienda.com/",
-        "StarGeek": "https://www.stargeek.es/",
-        "CardZone": "https://cardzone.es/",
-        "Gigamesh": "https://gigamesh.com/",
-        "Saruman Games": "https://sarumangames.es/",
-        "Comic Stores": "https://comicstores.es/",
-        "Kanto Cards": "https://kantocards.com/",
-        "Pokemillon": "https://www.pokemillon.com/",
+        "Isekai Alcorcón": "https://isekai-alcorcon.es/search?q=riftbound",
+        "Velkarion": "https://velkarion.com/search?q=riftbound",
+        "Zacatrus": "https://zacatrus.es/catalogsearch/result/?q=riftbound",
+        "Metropolis Center": (
+            "https://metropolis-center.com/catalogsearch/result/?q=riftbound"
+        ),
+        "Gameria": "https://gameria.es/76-league-of-legends-riftbound",
+        "Super Collectors": (
+            "https://www.supercollectors.es/search?q=riftbound"
+        ),
+        "Dracotienda": (
+            "https://dracotienda.com/catalogsearch/result/?q=riftbound"
+        ),
+        "StarGeek": "https://www.stargeek.es/search?q=riftbound",
+        "CardZone": (
+            "https://cardzone.es/collections/riftbound-league-of-legends"
+        ),
+        "Gigamesh": "https://gigamesh.com/?s=riftbound&post_type=product",
+        "Saruman Games": "https://sarumangames.es/search?q=riftbound",
+        "Comic Stores": "https://comicstores.es/search?q=riftbound",
+        "Kanto Cards": "https://kantocards.com/search?q=riftbound",
+        "Pokemillon": (
+            "https://www.pokemillon.com/?s=riftbound&post_type=product"
+        ),
         "La Torre Karin Store": "https://latorrekarinstore.es/",
-        "Ulduar": "https://www.ulduar.es/",
-        "Imperio Friki": "https://imperiofriki.com/",
-        "SunnyStore": "https://sunnystore.es/",
+        "Ulduar": "https://www.ulduar.es/?s=riftbound&post_type=product",
+        "Imperio Friki": (
+            "https://imperiofriki.com/?s=riftbound&post_type=product"
+        ),
+        "SunnyStore": "https://sunnystore.es/search?q=riftbound",
         "Riot Games Merch": "https://merch.riotgames.com/",
         "The Golden Rabbit Shop": (
             "https://thegoldenrabbitshop.es/categoria-producto/riftbound/"
         ),
         "Otakuya TCG": "https://tcg.otakuya.es/collections/tcg-de-riftbound",
         "Hyker Card House": "https://hykercardhouse.com/marca/riftbound/",
-        "Grille Cards": "https://grillecards.com/",
+        "Grille Cards": "https://grillecards.com/search?q=riftbound",
         "TCG Level": "https://tcglevel.com/collections/riftbound",
         "Micelion Games": (
             "https://miceliongames.com/product-category/juegos-tcg/"
@@ -180,49 +224,93 @@ ALL_STORES = {
         ),
     },
     "Italia - Negozi & Specializzati": {
-        "MOBA Store": "https://www.mobastore.it",
-        "OP SHOP": "https://opshop.it",
-        "Magic Store": "https://www.magicstore.it",
-        "iWozGaming": "https://iwozgaming.it",
-        "Golden Store Roma": "https://goldenstoreroma.it",
-        "Magliana Nerd": "https://www.magliananerd.it",
-        "Galactus": "https://galactus.it",
-        "Games Inn": "https://www.gamesinn.it",
-        "Games Time": "https://www.gamestime.it",
-        "Goblin Srl": "https://www.goblin.it",
-        "MagoMatto": "https://www.magomatto.com",
-        "Cards Capital City": "https://cardscapitalcity.it",
-        "Titan Gaming Center": "https://titangamingcenter.com",
-        "IL REGNO": "https://ilregno.it",
-        "ManaWeb": "https://manaweb.it",
-        "La Tana delle Pulci": "https://latanadellepulci.it",
-        "Dadi e Draghi": "https://www.dadiedraghi.com",
-        "Spazio Nerd": "https://spazionerd.it",
-        "Lost Legion": "https://lostlegion.it",
-        "B Games Bologna": "https://bgamesbologna.it",
-        "ONGAME": "https://ongame.it",
-        "Funside": "https://www.funside.it",
-        "Magicards": "https://magicards.it",
-        "Toon Kingdom": "https://toonkingdom.it",
-        "The Magic Spot": "https://themagicspot.it",
-        "Star Shop": "https://www.starshop.it",
-        "Firenze Comics and Games": "https://firenzecomicsandgames.it",
-        "Carta Magna": "https://cartamagna.it",
-        "The Realm": "https://therealm.it",
-        "La Gilda": "https://lagildadibusto.it",
-        "Dungeon Street": "https://dungeonstreet.it",
-        "4X Trading": "https://4xtrading.it",
-        "Il Covo del Nerd": "https://www.ilcovodelnerd.it",
-        "Pryce": "https://pryce.it",
-        "Teca Rara": "https://tecarara.it",
-        "Zero One": "https://zero-one.it",
-        "Anime Shop Italia": "https://animeshopitalia.it",
-        "Magic Merchant": "https://www.magicmerchant.it",
-        "Gameology": "https://www.gameology.it",
-        "Arcano Games": "https://www.arcanogames.it",
-        "Collector's Inn": "https://collectorsinn.it",
-        "Sanctum TCG": "https://sanctumtcg.it",
-        "TheManaShop": "https://themanashop.it",
+        "MOBA Store": "https://www.mobastore.it/?s=riftbound&post_type=product",
+        "OP SHOP": "https://opshop.it/?s=riftbound&post_type=product",
+        "Magic Store": (
+            "https://www.magicstore.it/?s=riftbound&post_type=product"
+        ),
+        "iWozGaming": "https://iwozgaming.it/?s=riftbound&post_type=product",
+        "Golden Store Roma": (
+            "https://goldenstoreroma.it/?s=riftbound&post_type=product"
+        ),
+        "Magliana Nerd": (
+            "https://www.magliananerd.it/?s=riftbound&post_type=product"
+        ),
+        "Galactus": "https://galactus.it/?s=riftbound&post_type=product",
+        "Games Inn": "https://www.gamesinn.it/?s=riftbound&post_type=product",
+        "Games Time": "https://www.gamestime.it/?s=riftbound&post_type=product",
+        "Goblin Srl": "https://www.goblin.it/?s=riftbound&post_type=product",
+        "MagoMatto": (
+            "https://www.magomatto.com/?s=riftbound&post_type=product"
+        ),
+        "Cards Capital City": (
+            "https://cardscapitalcity.it/?s=riftbound&post_type=product"
+        ),
+        "Titan Gaming Center": (
+            "https://titangamingcenter.com/?s=riftbound&post_type=product"
+        ),
+        "IL REGNO": "https://ilregno.it/?s=riftbound&post_type=product",
+        "ManaWeb": "https://manaweb.it/?s=riftbound&post_type=product",
+        "La Tana delle Pulci": (
+            "https://latanadellepulci.it/?s=riftbound&post_type=product"
+        ),
+        "Dadi e Draghi": (
+            "https://www.dadiedraghi.com/?s=riftbound&post_type=product"
+        ),
+        "Spazio Nerd": (
+            "https://spazionerd.it/?s=riftbound&post_type=product"
+        ),
+        "Lost Legion": (
+            "https://lostlegion.it/?s=riftbound&post_type=product"
+        ),
+        "B Games Bologna": (
+            "https://bgamesbologna.it/?s=riftbound&post_type=product"
+        ),
+        "ONGAME": "https://ongame.it/?s=riftbound&post_type=product",
+        "Funside": "https://www.funside.it/?s=riftbound&post_type=product",
+        "Magicards": "https://magicards.it/?s=riftbound&post_type=product",
+        "Toon Kingdom": (
+            "https://toonkingdom.it/?s=riftbound&post_type=product"
+        ),
+        "The Magic Spot": (
+            "https://themagicspot.it/?s=riftbound&post_type=product"
+        ),
+        "Star Shop": "https://www.starshop.it/?s=riftbound&post_type=product",
+        "Firenze Comics and Games": (
+            "https://firenzecomicsandgames.it/?s=riftbound&post_type=product"
+        ),
+        "Carta Magna": "https://cartamagna.it/?s=riftbound&post_type=product",
+        "The Realm": "https://therealm.it/?s=riftbound&post_type=product",
+        "La Gilda": (
+            "https://lagildadibusto.it/?s=riftbound&post_type=product"
+        ),
+        "Dungeon Street": (
+            "https://dungeonstreet.it/?s=riftbound&post_type=product"
+        ),
+        "4X Trading": "https://4xtrading.it/?s=riftbound&post_type=product",
+        "Il Covo del Nerd": (
+            "https://www.ilcovodelnerd.it/?s=riftbound&post_type=product"
+        ),
+        "Pryce": "https://pryce.it/?s=riftbound&post_type=product",
+        "Teca Rara": "https://tecarara.it/?s=riftbound&post_type=product",
+        "Zero One": "https://zero-one.it/?s=riftbound&post_type=product",
+        "Anime Shop Italia": (
+            "https://animeshopitalia.it/?s=riftbound&post_type=product"
+        ),
+        "Magic Merchant": (
+            "https://www.magicmerchant.it/catalog/advanced_search_result.php?keywords=riftbound"
+        ),
+        "Gameology": "https://www.gameology.it/?s=riftbound&post_type=product",
+        "Arcano Games": (
+            "https://www.arcanogames.it/?s=riftbound&post_type=product"
+        ),
+        "Collector's Inn": (
+            "https://collectorsinn.it/?s=riftbound&post_type=product"
+        ),
+        "Sanctum TCG": "https://sanctumtcg.it/?s=riftbound&post_type=product",
+        "TheManaShop": (
+            "https://themanashop.it/?s=riftbound&post_type=product"
+        ),
     },
 }
 
@@ -447,7 +535,6 @@ def check_store_stock(store_name, url):
       price_elem = item.find(class_=lambda x: x and "price" in x.lower())
       price = estrai_prezzo_pulito(price_elem)
 
-      # SCARTA SE IL PREZZO NON È VALIDO (EVITA FINTI PRODOTTI ESAURITI CON N/D)
       if price == "N/D":
         continue
 
