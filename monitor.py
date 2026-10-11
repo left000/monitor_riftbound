@@ -253,20 +253,14 @@ def manda_notifica_telegram(testo):
 def estrai_prezzo_pulito(elemento_html):
   if not elemento_html:
     return "N/D"
-
   testo = elemento_html.get_text()
-
-  # Cerca cifre seguite o precedute dal simbolo dell'euro (es: 199,95€, 199.95 €, €199.95)
   prezzi = re.findall(
       r"(?:€\s*\d+[\.,]?\d*|\d+[\.,]?\d*\s*€|\d+[\.,]?\d*\s*EUR)",
       testo,
       re.IGNORECASE,
   )
   if prezzi:
-    # Prende l'ultimo valore estratto (in caso di sconti è solitamente il prezzo finale)
-    prezzo_pulito = prezzi[-1].strip()
-    return prezzo_pulito
-
+    return prezzi[-1].strip()
   return "N/D"
 
 
@@ -406,55 +400,15 @@ def check_store_stock(store_name, url):
       else:
         continue
 
-      # Verifica se il prodotto è esaurito
+      # --- CONTROLLO ESAURITO MIGLIORATO ---
       is_exhausted = any(term in item_text for term in TERMINI_ESAURITO)
-      badges = item.find_all(
-          class_=lambda x: x
-          and any(
-              b in x.lower()
-              for b in [
-                  "agotado",
-                  "esaurito",
-                  "sold-out",
-                  "out-of-stock",
-                  "disabled",
-              ]
-          )
-      )
-      if badges:
-        for badge in badges:
-          if any(
-              t in badge.get_text().lower()
-              for t in [
-                  "agotado",
-                  "esaurito",
-                  "sold out",
-                  "sin stock",
-                  "non disponibile",
-              ]
-          ):
-            is_exhausted = True
-            break
 
-      buy_button = item.find(
-          ["button", "a", "input"],
-          class_=lambda x: x
-          and any(
-              b in x.lower()
-              for b in [
-                  "add",
-                  "comprar",
-                  "cart",
-                  "btn",
-                  "acquista",
-                  "carrello",
-              ]
-          ),
-      )
-      if buy_button:
-        btn_text = buy_button.get_text().lower()
-        if any(
-            t in btn_text
+      # Controlla tutti i bottoni/pulsanti all'interno dell'articolo per attributi "disabled" o testi esauriti
+      buttons = item.find_all(["button", "input", "a"])
+      for btn in buttons:
+        btn_txt = btn.get_text().lower()
+        if btn.has_attr("disabled") or any(
+            t in btn_txt
             for t in [
                 "agotado",
                 "esaurito",
@@ -466,11 +420,31 @@ def check_store_stock(store_name, url):
             ]
         ):
           is_exhausted = True
-        if buy_button.has_attr("disabled"):
-          is_exhausted = True
+          break
+
+      # Controlla classi CSS comuni di Shopify/WooCommerce per esaurito
+      all_classes_str = " ".join(
+          [
+              cls
+              for elem in item.find_all(True)
+              for cls in elem.get("class", [])
+          ]
+      ).lower()
+      if any(
+          term in all_classes_str
+          for term in [
+              "sold-out",
+              "out-of-stock",
+              "disabled",
+              "agotado",
+              "esaurito",
+          ]
+      ):
+        is_exhausted = True
 
       if is_exhausted:
         continue
+      # -------------------------------------
 
       price_elem = item.find(class_=lambda x: x and "price" in x.lower())
       price = estrai_prezzo_pulito(price_elem)
