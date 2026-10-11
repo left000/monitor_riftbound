@@ -1,10 +1,11 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
+import re
 import time
 from bs4 import BeautifulSoup
 import requests
 
-# Legge i token segreti direttamente dall'ambiente di GitHub Actions
+# Legge i token segreti dall'ambiente di GitHub Actions
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
@@ -87,163 +88,110 @@ TERMINI_ESAURITO = [
 ]
 
 ALL_STORES = {
-    "Spagna - Marketplace & Grandi e-Commerce": {
-        "CardZone": "https://cardzone.es/collections/riftbound-league-of-legends",
-        "Gameria": "https://gameria.es/76-league-of-legends-riftbound",
-        "Metrópolis Center": "https://metropolis-center.com",
-        "Zacatrus": "https://zacatrus.es",
-        "GAME": "https://www.game.es",
-        "TopDeck": "https://topdeck.es/collections/all",
-        "Dungeon Marvels": "https://dungeonmarvels.com",
-    },
-    "Spagna - Negozi Specializzati & Catene (Gruppo 1)": {
-        "Factory Cards": "https://factorycards.es",
-        "Micelion Games": "https://miceliongames.com",
-        "Padis Store": (
-            "https://www.padis-store.com/en/443-riftbound-league-of-legends-tcg"
+    "Spagna - Negozi & Specializzati": {
+        "Factory Cards TCG": "https://factorycardstcg.com/",
+        "TopDeck": "https://topdeck.es/",
+        "Zial TCG": "https://www.zialtcg.com/",
+        "Ninpo Store": "https://ninpostore.com/",
+        "La Cueva Roja": "https://lacuevaroja.com/",
+        "Magic Event GN": "https://www.magiceventgn.com/",
+        "Ingenio BCN": "https://ingeniobcn.es/",
+        "Monarka TCG": "https://monarkatcg.store/",
+        "Padis Store": "https://www.padisl5r.com/",
+        "Empire Games": "https://www.empiregames.es/",
+        "Ateneo Comics": "https://www.ateneocomics.com/",
+        "Nymeria Comics": "https://www.nymeriacomics.com/",
+        "Tempest Store": "https://www.tempeststore.com/",
+        "Paladin Store": "https://paladinstore.es/",
+        "Pulsar Store": "https://pulsarstore.com/",
+        "Manavortex": "https://manavortex.es/",
+        "La Forja de Cartas": "https://www.laforjadecartas.com/",
+        "La Escotilla Juegos": "https://laescotillajuegos.com/",
+        "La Jugonzona": "https://www.lajugonzona.shop/",
+        "Warlotus": "https://warlotus.com/",
+        "TCG Mansion": "https://tcgmansion.com/",
+        "TCG Factory": "https://tcgfactory.com/",
+        "Panda Games": "https://pandagames.es/",
+        "OZ Juegos": "https://www.ozjuegos.com/",
+        "Hero Freaks": "https://www.herofreaks.com/",
+        "HoloPlaza TCG": "https://holoplazatcg.com/",
+        "AllInTCG": "https://allintcg.com/",
+        "Dungeon Marvels": "https://www.dungeonmarvels.com/",
+        "JJCollection": "https://www.jjcollection.es/",
+        "Montalfan": "https://montalfan.com/",
+        "El Duelista": "https://www.elduelista.com/",
+        "Puerto Fantasy": "https://www.puertofantasy.es/",
+        "Don Mazo": "https://www.donmazo.com/",
+        "Madrid Norte TCG": "https://madridnortetcg.com/",
+        "Shark Games": "https://sharkgames.es/",
+        "Rebellion": "https://rebellion.es/",
+        "TCG Parada": "https://www.tcgparada.com/",
+        "TPK Hobby Games": "https://www.tpkhobbygames.com/",
+        "Epic Hit Store": "https://www.epichitstore.es/",
+        "Estalia Córdoba": "https://estaliacordoba.com/",
+        "Metamorph Center": "https://metamorphcenter.com/",
+        "Shiny Hit": "https://shinyhit.com/",
+        "TCG Multiverse": "https://www.tcgmultiverse.es/",
+        "Colossal Store": "https://www.colossalstore.es/",
+        "El Orco Rojo": "https://www.elorcorojo.com/",
+        "Generación X": "https://www.generacionx.es/",
+        "Llibreria Kritik": "https://www.llibreriakritik.com/",
+        "Lorcanos": "https://www.lorcanos.com/",
+        "La Guarida Juegos": "https://laguaridajuegos.com/",
+        "City of Cards": "https://cityof.cards/",
+        "TCG Map Spain": "https://tcgmapspain.com/",
+        "Isekai Alcorcón": "https://isekai-alcorcon.es/",
+        "Velkarion": "https://velkarion.com/",
+        "Zacatrus": "https://zacatrus.es/",
+        "Metropolis Center": "https://metropolis-center.com/",
+        "Gameria": "https://gameria.es/",
+        "Super Collectors": "https://www.supercollectors.es/",
+        "Dracotienda": "https://dracotienda.com/",
+        "StarGeek": "https://www.stargeek.es/",
+        "CardZone": "https://cardzone.es/",
+        "Gigamesh": "https://gigamesh.com/",
+        "Saruman Games": "https://sarumangames.es/",
+        "Comic Stores": "https://comicstores.es/",
+        "Kanto Cards": "https://kantocards.com/",
+        "Pokemillon": "https://www.pokemillon.com/",
+        "La Torre Karin Store": "https://latorrekarinstore.es/",
+        "Ulduar": "https://www.ulduar.es/",
+        "Imperio Friki": "https://imperiofriki.com/",
+        "SunnyStore": "https://sunnystore.es/",
+        "Riot Games Merch": "https://merch.riotgames.com/",
+        "The Golden Rabbit Shop": (
+            "https://thegoldenrabbitshop.es/categoria-producto/riftbound/"
         ),
-        "Madrid Norte TCG": (
-            "https://madridnortetcg.com/en/collections/riftbound-tcg"
+        "Otakuya TCG": "https://tcg.otakuya.es/collections/tcg-de-riftbound",
+        "Hyker Card House": "https://hykercardhouse.com/marca/riftbound/",
+        "Grille Cards": "https://grillecards.com/",
+        "TCG Level": "https://tcglevel.com/collections/riftbound",
+        "Micelion Games": (
+            "https://miceliongames.com/product-category/juegos-tcg/"
         ),
-        "Metamorph Center": "https://metamorphcenter.com",
-        "El Duelista": "https://elduelista.com",
-        "Ninpo Store": "https://ninpostore.com",
-        "La Guarida Juegos": "https://laguaridajuegos.com",
-        "Gladius Games": "https://gladiusgames.es",
-        "Velkarion": "https://velkarion.com",
-        "Aquijabara Store": "https://aquijabara.com",
-        "Generación X Carranza": "https://generacionx.es",
-        "Kingdom Wargames": "https://kingdomwargames.es",
-        "Tempest Store": "https://tempeststore.es",
-        "OZ Juegos": (
-            "https://ozjuegos.com/categoria-producto/juegos-de-cartas/riftbound-league-of-legends-tcg/"
+        "Wizard TCG": "https://www.wizardtcg.com/collections/rifbound",
+        "TCG Academy": "https://www.tcgacademy.es/riftbound/",
+        "Cosmic Blazar": "https://cosmicblazar.store/catalogo?game=rift",
+        "Origen Juegos": (
+            "https://www.origenjuegos.com/tienda/producto/riftbound-origins"
         ),
-        "Júpiter Juegos": "https://jupiterjuegos.com",
-    },
-    "Spagna - Negozi Specializzati & Catene (Gruppo 2)": {
-        "Epic Hit Store": "https://epichitstore.com",
-        "HoloPlaza TCG": "https://holoplazatcg.com",
-        "JJCollection": "https://jjcollection.es",
-        "Saruman Games": "https://sarumangames.com",
-        "G3 TCG": "https://g3tcg.com",
-        "Estalia Games": "https://estaliagames.com",
-        "La Forja": "https://laforjajuegos.com",
-        "CardCrack": "https://cardcrack.es",
-        "Empire Games": (
-            "https://www.empiregames.es/categoria-producto/juegos-de-cartas-coleccionables/league-of-legends-tcg-riftbound/"
+        "Three Stones Games": (
+            "https://threestonesgames.com/collections/riftbound"
         ),
-        "A Dado y Pluma": "https://adadoypluma.com",
-        "Unchained Games": "https://unchainedgames.es",
-        "Tini Games": "https://tinigames.es",
-        "TCG Legacy": "https://tcglegacy.es",
-        "IngenioBCN": "https://ingeniobcn.com",
-        "La Tienda Scum": "https://latiendascum.com",
-        "Matsuri Comics": "https://matsuricomics.com",
     },
-    "Spagna - Negozi Specializzati & Catene (Gruppo 3)": {
-        "Toreka Games": "https://torekagames.com",
-        "El Nexo SF": "https://elnexosf.com",
-        "Magic Event": "https://magicevent.es",
-        "La Escotilla": "https://laescotillajuegos.com",
-        "City of Cards": "https://cityofcards.es",
-        "Aether Alicante": "https://aetheralicante.com",
-        "Daruma Games": "https://darumagames.es",
-        "Arcane Hall": "https://arcanehall.es",
-        "Rift Nexus Game Store": "https://riftnexus.es",
-        "ELIUS": "https://elius.es",
-        "Pulsar Store": "https://pulsarstore.es",
-        "Júpiter Juegos Castellón": "https://jupiterjuegoscastellon.com",
-        "La Torre Karin Store": "https://latorrekarin.com",
-        "TPK Hobby & Games": "https://tpkhobby.es",
-        "Júpiter Juegos Ourense": "https://jupiterjuegosourense.com",
-        "La Plaza Bilbao": "https://laplazabilbao.com",
-    },
-    "Spagna - Collezionismo & Community TCG (Gruppo 4)": {
-        "Cartas Mencey": "https://cartasmencey.com",
-        "TCG Parada": "https://tcgparada.com",
-        "Ludicón": "https://ludicon.es",
-        "Magic Mallorca": "https://magicmallorca.com",
-        "Monarka TCG": "https://monarkatcg.com",
-        "Tierra616": "https://tierra616.es",
-        "AllInTCG": "https://allintcg.es",
-        "BaruZcard": "https://baruzcard.com",
-        "Bescards": "https://bescards.com",
-        "BimbaCards": "https://bimbacards.com",
-        "Break The Case": "https://breakthecase.es",
-        "CanaryPop": "https://canarypop.es",
-        "Cardverse": "https://cardverse.es",
-        "Checollect": "https://checollect.com",
-        "Dabas": "https://dabas.es",
-        "Distrito Zero": "https://distritozero.es",
-        "Freak Corp": "https://freakcorp.es",
-        "Gamescape": "https://gamescape.es",
-        "Golden Pulls Cards": "https://goldenpullscards.com",
-        "GrilleCards": "https://grillecards.com",
-        "HeroFreaks": "https://herofreaks.com",
-        "Homelands": "https://homelands.es",
-    },
-    "Spagna - Ultime novità e Collezionismo (Gruppo 5)": {
-        "Ikigai Comics": "https://ikigaicomics.com",
-        "Indústria 61": "https://industria61.com",
-        "Kame House Cards": "https://kamehousecards.com",
-        "KeepSeven": "https://keepseven.es",
-        "KuriGames": "https://kurigames.com",
-        "La Tienda de las Cartas": "https://latiendadelascartas.com",
-        "LorcanosTCG": "https://lorcanostcg.es",
-        "Lotus Valley": "https://lotusvalley.es",
-        "Magic Omens": "https://magicomens.com",
-        "MagicNerd": "https://magicnerd.es",
-        "ManaTCG": "https://manatcg.es",
-        "Manavortex": "https://manavortex.es",
-        "Merchfox": "https://merchfox.com",
-        "Minas de Moria": "https://minasdemoria.com",
-        "Mono de Juegos": (
-            "https://www.monodejuegos.shop/categoria-producto/trading-cards/riftbound/"
-        ),
-        "Monsters Collectors": "https://monsterscollectors.com",
-        "Otakura": "https://otakura.com",
-        "Otakuya": "https://otakuya.es",
-        "Pocketcards": "https://pocketcards.es",
-        "Plaza TCG": "https://plazatcg.com",
-        "Plugstars": "https://plugstars.es",
-        "Poke-Geek": "https://poke-geek.com",
-        "PokeBros": "https://pokebros.es",
-        "PokeCards Store": "https://pokecardsstore.es",
-        "PokeFamily": "https://pokefamily.es",
-        "PokeTalk": "https://poketalk.es",
-        "Pokeca": "https://pokeca.es",
-        "Psydeck": "https://psydeck.com",
-        "RelicTCG": "https://relictcg.es",
-        "Snooop": "https://snooop.es",
-        "Solo Hits": "https://solohits.es",
-        "StarGeek": "https://stargeek.es",
-        "SunnyStore": "https://sunnystore.es",
-        "TCG Level": "https://tcglevel.es",
-        "TCGdirect": "https://tcgdirect.es",
-        "Templars Arena": "https://templarsarena.com",
-        "Tsuki Center": "https://tsukicenter.com",
-        "Universe TCG": "https://universetcg.es",
-        "Vicol TCG": "https://vicoltcg.com",
-        "VintiCards": "https://vinticards.com",
-        "Yonko TCG": "https://yonkotcg.es",
-    },
-    "Italia - Negozi e Fumetterie Principali (Gruppo 1)": {
+    "Italia - Negozi & Specializzati": {
         "MOBA Store": "https://www.mobastore.it",
         "OP SHOP": "https://opshop.it",
         "Magic Store": "https://www.magicstore.it",
         "iWozGaming": "https://iwozgaming.it",
-        "Golden Store Roma Talenti": "https://goldenstoreroma.it",
+        "Golden Store Roma": "https://goldenstoreroma.it",
         "Magliana Nerd": "https://www.magliananerd.it",
-        "Galactus Roma": "https://galactus.it",
-        "Galactus Tuscolana": "https://galactus.it",
-        "Galactus Tiburtina": "https://galactus.it",
+        "Galactus": "https://galactus.it",
         "Games Inn": "https://www.gamesinn.it",
-        "Games Time Torino Centro": "https://www.gamestime.it",
+        "Games Time": "https://www.gamestime.it",
         "Goblin Srl": "https://www.goblin.it",
         "MagoMatto": "https://www.magomatto.com",
-    },
-    "Italia - Specializzati TCG & Collezionismo (Gruppo 2)": {
-        "Cards Capital City Cormano": "https://cardscapitalcity.it",
+        "Cards Capital City": "https://cardscapitalcity.it",
         "Titan Gaming Center": "https://titangamingcenter.com",
         "IL REGNO": "https://ilregno.it",
         "ManaWeb": "https://manaweb.it",
@@ -253,128 +201,83 @@ ALL_STORES = {
         "Lost Legion": "https://lostlegion.it",
         "B Games Bologna": "https://bgamesbologna.it",
         "ONGAME": "https://ongame.it",
-        "Funside Katané": "https://www.funside.it",
+        "Funside": "https://www.funside.it",
         "Magicards": "https://magicards.it",
         "Toon Kingdom": "https://toonkingdom.it",
         "The Magic Spot": "https://themagicspot.it",
-    },
-    "Italia - Distribuzione e Hobby Store (Gruppo 3)": {
-        "Star Shop Firenze Distribuzione": "https://www.starshop.it",
+        "Star Shop": "https://www.starshop.it",
         "Firenze Comics and Games": "https://firenzecomicsandgames.it",
         "Carta Magna": "https://cartamagna.it",
         "The Realm": "https://therealm.it",
-        "La Gilda di Busto": "https://lagildadibusto.it",
+        "La Gilda": "https://lagildadibusto.it",
         "Dungeon Street": "https://dungeonstreet.it",
-        "4X Trading Shop & Play": "https://4xtrading.it",
-        "Starshop Lucca": "https://starshoplucca.it",
-        "Topgame": "https://topgame.it",
+        "4X Trading": "https://4xtrading.it",
         "Il Covo del Nerd": "https://www.ilcovodelnerd.it",
         "Pryce": "https://pryce.it",
         "Teca Rara": "https://tecarara.it",
         "Zero One": "https://zero-one.it",
         "Anime Shop Italia": "https://animeshopitalia.it",
-    },
-    "Italia - Videogames, Nerd & Geek Shop (Gruppo 4)": {
-        "Time Out Videogames": "https://timeoutvideogames.it",
-        "Iconic Cards": "https://iconiccards.it",
-        "Games-Shop": "https://games-shop.it",
         "Magic Merchant": "https://www.magicmerchant.it",
-        "Ludosport": "https://ludosport.net",
-        "GameOnly": "https://gameonly.it",
         "Gameology": "https://www.gameology.it",
         "Arcano Games": "https://www.arcanogames.it",
-        "Fumettopoli": "https://fumettopoli.it",
-        "TCG Factory Milano": "https://tcgfactory.it",
         "Collector's Inn": "https://collectorsinn.it",
-        "LaBotteSecrete": "https://labottesecrete.it",
         "Sanctum TCG": "https://sanctumtcg.it",
         "TheManaShop": "https://themanashop.it",
-    },
-    "Italia - Collezionismo Estero ed Europeo (Gruppo 5)": {
-        "YottoStore": "https://yottostore.com",
-        "Vega-TCG": "https://vega-tcg.com",
-        "SunEaterGames": "https://suneatergames.com",
-        "Emporium del D20": "https://emporiumd20.it",
-        "Runik GS Events": "https://runik.it",
-        "GGCollectorsGames": "https://ggcollectorsgames.com",
-        "EuropeTCG": "https://europetcg.com",
-        "NeyzerTCG": "https://neyzertcg.com",
-        "AdventureTCG": "https://adventuretcg.com",
-        "MO-CARDS": "https://mo-cards.com",
-        "Multivers Paris": "https://www.multivers.fr",
-        "PhyrexianMTG": "https://phyrexianmtg.com",
-        "BoardCraft": "https://boardcraft.fr",
-        "Parkage": "https://www.parkage.com",
-        "Ludeek09": "https://ludeek09.fr",
-        "Antre des Geeks": "https://www.antredesgeeks.com",
-    },
-    "Italia - Ultime Aggiunte e Reti Nazionali (Gruppo 6)": {
-        "Magic Warrior Mestre": "https://magicwarrior.it",
-        "MonkeyCards": "https://monkeycards.it",
-        "Mana Flask": "https://manaflask.it",
-        "ASD Il Rifugio": "https://asdilrifugio.it",
-        "Alpha Comix": "https://alphacomix.it",
-        "Dark Zone": "https://darkzone.it",
-        "December Dungeon": "https://decemberdungeon.it",
-        "The Match Store": "https://thematchstore.it",
-        "Games Academy Catania": "https://www.gamesacademy.it",
-        "Funside": "https://www.funside.it",
-        "La Gilda Store": "https://lagildastore.it",
-        "Cards Capital City": "https://cardscapitalcity.it",
-        "Games Inn Torino": "https://www.gamesinn.it",
-        "Firenze Comics & Games": "https://firenzecomicsandgames.it",
-        "Star Shop": "https://www.starshop.it",
-        "Carta Magna Firenze": "https://cartamagna.it",
-        "The Realm Firenze": "https://therealm.it",
-        "Titan Gaming Center Milano": "https://titangamingcenter.com",
-        "Games Time": "https://www.gamestime.it",
-        "Galactus": "https://galactus.it",
-        "Il Regno": "https://ilregno.it",
-        "Magic Store Italia": "https://www.magicstore.it",
-        "OP Shop Milano": "https://opshop.it",
-        "Manicomix": "https://www.manicomix.com",
-        "Manicomix Distribuzione": "https://www.manicomix.com",
     },
 }
 
 
 def manda_notifica_telegram(testo):
   if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-    print(
-        "[!] Errore Telegram: Token o Chat ID mancanti tra le variabili"
-        " d'ambiente."
-    )
+    print("[!] Errore Telegram: Token o Chat ID mancanti.")
     return False
   url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-  payload = {"chat_id": TELEGRAM_CHAT_ID, "text": testo, "parse_mode": "Markdown"}
+  payload = {
+      "chat_id": TELEGRAM_CHAT_ID,
+      "text": testo,
+      "parse_mode": "Markdown",
+      "disable_web_page_preview": True,
+  }
   try:
     res = requests.post(url, json=payload, timeout=10)
     data = res.json()
     if not data.get("ok"):
-      print(f"[!] Errore da Telegram API: {data.get('description')}")
+      print(f"[!] Errore Telegram API: {data.get('description')}")
       return False
     return True
   except Exception as e:
-    print(f"[!] Errore di connessione a Telegram: {e}")
+    print(f"[!] Errore connessione Telegram: {e}")
     return False
+
+
+def estrai_prezzo_pulito(elemento_html):
+  if not elemento_html:
+    return "N/D"
+
+  testo = elemento_html.get_text()
+
+  # Cerca cifre seguite o precedute dal simbolo dell'euro (es: 199,95€, 199.95 €, €199.95)
+  prezzi = re.findall(
+      r"(?:€\s*\d+[\.,]?\d*|\d+[\.,]?\d*\s*€|\d+[\.,]?\d*\s*EUR)",
+      testo,
+      re.IGNORECASE,
+  )
+  if prezzi:
+    # Prende l'ultimo valore estratto (in caso di sconti è solitamente il prezzo finale)
+    prezzo_pulito = prezzi[-1].strip()
+    return prezzo_pulito
+
+  return "N/D"
 
 
 def check_store_stock(store_name, url):
   print(f"[*] Analizzando store ({store_name}) -> {url}")
   try:
-    response = requests.get(url, headers=HEADERS, timeout=8)
+    response = requests.get(url, headers=HEADERS, timeout=10)
     if response.status_code != 200:
       return []
 
     html = response.text
-    if (
-        "myshopify.com" in html
-        or "shopifycdn.com" in html
-        or "Shopify.shop" in html
-    ):
-      print(f"[-] Escluso {store_name}: Piattaforma Shopify rilevata.")
-      return []
-
     soup = BeautifulSoup(html, "html.parser")
     found_products = []
     seen_urls = set()
@@ -435,6 +338,7 @@ def check_store_stock(store_name, url):
       ):
         continue
 
+      # Esclusione rigida di altre lingue
       lingue_da_escludere = [
           "italiano",
           "italian",
@@ -455,28 +359,11 @@ def check_store_stock(store_name, url):
           "日本語",
           "japanese",
       ]
-      if any(lang in title_lower or lang in item_text for lang in lingue_da_escludere):
-        continue
-
-      if (
-          "lingua" in item_text
-          or "language" in item_text
-          or "idioma" in item_text
+      if any(
+          lang in title_lower or lang in item_text
+          for lang in lingue_da_escludere
       ):
-        if (
-            "ital" in item_text
-            or "frances" in item_text
-            or "allemand" in item_text
-            or "alemán" in item_text
-            or "chino" in item_text
-            or "espan" in item_text
-        ):
-          if (
-              "english" not in item_text
-              and "inglese" not in item_text
-              and "ingles" not in item_text
-          ):
-            continue
+        continue
 
       if any(
           bad in title_lower
@@ -513,14 +400,13 @@ def check_store_stock(store_name, url):
       )
 
       if is_case:
-        product_type = "CASE (6x Booster Box)"
+        product_type = "CASE (6x Box)"
       elif is_display_24:
-        product_type = "CAJA SUELTA (24 Booster Display)"
+        product_type = "BOOSTER BOX (24 Display)"
       else:
         continue
 
-      seen_urls.add(product_link)
-
+      # Verifica se il prodotto è esaurito
       is_exhausted = any(term in item_text for term in TERMINI_ESAURITO)
       badges = item.find_all(
           class_=lambda x: x
@@ -587,11 +473,9 @@ def check_store_stock(store_name, url):
         continue
 
       price_elem = item.find(class_=lambda x: x and "price" in x.lower())
-      price = (
-          price_elem.get_text(strip=True)
-          if price_elem
-          else "Prezzo non trovato"
-      )
+      price = estrai_prezzo_pulito(price_elem)
+
+      seen_urls.add(product_link)
 
       found_products.append({
           "store": store_name,
@@ -604,22 +488,18 @@ def check_store_stock(store_name, url):
       })
 
     return found_products
-  except Exception as e:
+  except Exception:
     return []
 
 
 def process_store(region, store_name, store_url):
   results = check_store_stock(store_name, store_url)
-  available = [
-      p
-      for p in results
-      if "DISPONIBILE" in p["status"] or "EN STOCK" in p["status"]
-  ]
+  available = [p for p in results if "DISPONIBILE" in p["status"]]
   return region, available
 
 
 if __name__ == "__main__":
-  print("=== Avvio scansione totale SPAGNA + ITALIA (SOLO INGLESE) ===")
+  print("=== Avvio scansione totale SPAGNA + ITALIA ===")
   report_by_region = {}
 
   with ThreadPoolExecutor(max_workers=15) as executor:
@@ -637,51 +517,25 @@ if __name__ == "__main__":
           report_by_region[region] = []
         report_by_region[region].extend(available)
 
-  report_content = (
-      "# REPORT DISPONIBILITÀ RIFTBOUND (SPAGNA + ITALIA - SOLO INGLESE)\n\n"
-  )
-  report_content += (
-      f"*Data e ora scansione:* {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-  )
-  report_content += "---\n\n"
-
   messaggio_telegram = "🚨 *RIFTBOUND ALERT: PRODOTTI DISPONIBILI!* 🚨\n\n"
   trovati_prodotti = False
 
-  if not report_by_region:
-    report_content += "Nessun prodotto trovato.\n"
-  else:
+  if report_by_region:
     for region, products in report_by_region.items():
-      report_content += f"## 📍 {region}\n\n"
-      messaggio_telegram += f"*{region}*\n"
+      messaggio_telegram += f"📍 *{region}*\n"
       for prod in products:
         trovati_prodotti = True
-        report_content += f"### [{prod['store']}]({prod['url']})\n"
-        report_content += f"- **Set:** {prod['set']}\n"
-        report_content += f"- **Formato:** {prod['type']}\n"
-        report_content += f"- **Prezzo:** {prod['price']}\n\n"
-        report_content += "---\n\n"
-
         messaggio_telegram += (
-            f"• [{prod['store']}]({prod['url']}) - *{prod['set']}* ({prod['price']})\n"
+            f"• [{prod['store']}]({prod['url']}) - *{prod['set']}* "
+            f"({prod['type']}) -> *{prod['price']}*\n"
         )
       messaggio_telegram += "\n"
-
-  file_name = "report_riftbound_spagna_italia_inglese.md"
-  with open(file_name, "w", encoding="utf-8") as f:
-    f.write(report_content)
 
   if trovati_prodotti:
     inviato = manda_notifica_telegram(messaggio_telegram)
     if inviato:
       print("[OK] Prodotti trovati e notifica inviata su Telegram!")
     else:
-      print(
-          "[!] Prodotti trovati ma invio Telegram FALLITO. Controlla il log"
-          " sopra."
-      )
+      print("[!] Prodotti trovati ma invio Telegram FALLITO.")
   else:
-    print(
-        "[INFO] Nessun prodotto disponibile in questo momento. Telegram non"
-        " disturbato."
-    )
+    print("[INFO] Nessun prodotto disponibile in questo momento.")
